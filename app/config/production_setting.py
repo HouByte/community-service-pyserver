@@ -3,4 +3,3 @@
 # @Author : Vincent Vic
 # @File : production_setting.py
 # @Software: PyCharm
-FLASK_DEBUG=0

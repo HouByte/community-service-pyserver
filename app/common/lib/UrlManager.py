@@ -11,5 +11,6 @@ class UrlManager(object):
 
     @staticmethod
     def buildStaticUrl(path):
-        path = path + "?ver="+"20220429"
+        ver = "%s"%(1.0)
+        path = "/static"+ path + "?ver="+ver
         return UrlManager.buildUrl(path)

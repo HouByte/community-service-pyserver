@@ -4,7 +4,7 @@
 # @File : app.py
 # @Software: PyCharm
 from application import app
-
+import web.controller.PageRegister
 
 # web server
 if __name__ == '__main__':
@@ -12,5 +12,4 @@ if __name__ == '__main__':
         app.run(host="0.0.0.0", port=5000, load_dotenv=True)
     except Exception as e:
         import traceback
-
         traceback.print_exc()
