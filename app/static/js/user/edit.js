@@ -21,6 +21,9 @@ var user_edit_ops = {
             var mobile_target = $(".user_edit_wrap input[name=mobile]");
             var mobile = mobile_target.val();
 
+            var sex_target = $(".user_edit_wrap input[name=sex]");
+            var sex = sex_target.val();
+
             if (!mobile || mobile.length < 2) {
                 common_ops.tip("请输入符合规范的手机号~", mobile_target);
                 return false;
@@ -42,7 +45,8 @@ var user_edit_ops = {
             var data = {
                 nickname: nickname,
                 email: email,
-                mobile: mobile
+                mobile: mobile,
+                sex: sex
             }
 
             $.ajax({

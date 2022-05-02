@@ -6,6 +6,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <title>管理后台</title>
     <link href="{{ buildStaticUrl('/bootstrap/bootstrap.min.css') }}" rel="stylesheet">
+    <link href="{{ buildStaticUrl('/plugins/layer/css/layui.css') }}" rel="stylesheet">
     <link href="{{ buildStaticUrl('/font-awesome/css/font-awesome.min.css') }}" rel="stylesheet">
     <link href="{{ buildStaticUrl('/css/style.css') }}" rel="stylesheet">
     {%block css %}{% endblock %}
@@ -27,10 +28,12 @@
                     <a href="{{ buildUrl('/') }}"><i class="fa fa-dashboard fa-lg"></i>
                         <span class="nav-label">仪表盘</span></a>
                 </li>
-                <li class="account">
-                    <a href="{{ buildUrl('/account/index') }}"><i class="fa fa-user fa-lg"></i> <span
-                            class="nav-label">账号管理</span></a>
-                </li>
+                {% if current_user.uid == 1 or current_user.login_name == 'root' %}
+                    <li class="account">
+                        <a href="{{ buildUrl('/account/index') }}"><i class="fa fa-user fa-lg"></i> <span
+                                class="nav-label">账号管理</span></a>
+                    </li>
+                {% endif %}
                 <li class="member">
                     <a href="{{ buildUrl('/member/index') }}"><i class="fa fa-group fa-lg"></i> <span
                             class="nav-label">会员列表</span></a>
@@ -64,6 +67,11 @@
 						<span class="m-r-sm text-muted welcome-message">
                             欢迎使用社区服务管理后台
                         </span>
+                         {% if current_user.login_name == 'root' %}
+                            <span class="layui-badge layui-bg-blue">超级管理员</span>
+                         {% else %}
+                            <span class="layui-badge layui-bg-green">管理员</span>
+                         {% endif %}
                     </li>
                     <li class="dropdown user_info">
                         <a class="dropdown-toggle" data-toggle="dropdown" href="javascript:void(0);">

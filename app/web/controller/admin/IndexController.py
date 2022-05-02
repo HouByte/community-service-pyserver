@@ -4,10 +4,14 @@
 # @File : IndexController.py
 # @Software: PyCharm
 import json
+import uuid
 
 from flask import Blueprint, request, make_response, redirect, g
 
 from application import app
+from common.lib.Utils import ObjToJson
+from common.lib.constant import ADMIN_TOKEN_KEY_REDIS, ADMIN_UID_KEY_REDIS
+from common.lib.redis import Redis
 from web.service.UserService import UserService
 from common.lib.Response import Response
 from common.lib.UrlManager import UrlManager
@@ -37,14 +41,24 @@ def login():
         "login_name": login_name,
         "login_pwd": login_pwd
     }
-    resp = userService.login(data)
+    resp  = userService.login(data)
     if not resp:
         return resp.toJson()
     if not resp.isSuccess():
         return resp.toJson()
-    response: any = make_response(resp.toJson())
-    response.set_cookie(app.config['AUTH_COOKIE_NAME'], resp.data)
-    return response
+    cookieResponse = make_response(Response.successMsg("登入成功").toJson())
+
+    user_info = resp.data
+    token = str(uuid.uuid4())
+
+    info = userService.getInfoJson(user_info)
+
+    Redis.write(ADMIN_TOKEN_KEY_REDIS+token, json.dumps(info))
+    Redis.write(ADMIN_UID_KEY_REDIS+str(user_info.uid), token)
+    # cookie 存储token 1天
+    cookieResponse.set_cookie(app.config['AUTH_COOKIE_NAME'], token, 60 * 60 * 24 * 1)
+
+    return cookieResponse
 
 
 @page_index.route("/logout")

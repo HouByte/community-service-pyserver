@@ -5,10 +5,12 @@
 # @Software: PyCharm
 import logging
 
+import redis
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 import os
 from dotenv import load_dotenv
+
 from common.lib.UrlManager import UrlManager
 
 dotenv_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), '.flaskenv')
@@ -27,6 +29,11 @@ app.config.from_pyfile('config/%s_setting.py' % env)
 
 # 创建数据操作对象
 db = SQLAlchemy(app)
+
+redis_host = app.config['REDIS_HOST']
+redis_port = app.config['REDIS_PORT']
+redis_db = app.config['REDIS_DB']
+r_db = redis.StrictRedis(redis_host, redis_port, redis_db)
 
 # 模板全局方法
 app.add_template_global(UrlManager.buildStaticUrl, 'buildStaticUrl')

@@ -42,5 +42,12 @@ class Response:
     def toJson(self):
         return ObjToJson(self)
 
+    def toSimpleJson(self):
+        info = {
+            'code':self.code,
+            'msg':self.msg
+        }
+        return info
+
     def isSuccess(self):
         return  self.code == 200

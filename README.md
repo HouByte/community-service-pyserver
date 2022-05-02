@@ -1,6 +1,17 @@
 # 社区服务 Python 服务端
-## 一、技术
-- Flask
+## 一、技术及依赖
+### 框架依赖
+- Flask 2.1.2
+- Flask-SQLAlchemy 2.5.1
+- mysqlclient 2.1.0
+- redis 4.2.2
+- Flask sqlacodegen 1.1.8
+- Jinja 3.1.2
+
+# 设施依赖
+- Mysql 5.7 
+- Redis 6.0
+
 ## 二、启动
 ```shell
 python -m flask run
@@ -29,7 +40,7 @@ python -m flask run
 |   requirements.txt # 环境依赖
 ```
 
-## model 生成
+## 四、model 生成
 > 使用 flask-sqlacodegen 扩展 方便快速生成 ORM model 
 > 
 ```shell

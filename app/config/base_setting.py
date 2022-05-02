@@ -19,8 +19,13 @@ API_IGNORE_URLS = [
     "^/api"
 ]
 
-PAGE_SIZE = 50
+PAGE_SIZE = 10
 PAGE_DISPLAY = 10
+
+STATUS_MAPPING = {
+    "1": "正常",
+    "0": "冻结",
+}
 
 MINA_APP = {
     "appid": "wx759d38ee4da2062d",
