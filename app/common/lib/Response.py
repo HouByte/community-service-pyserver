@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # @Time : 2022/4/30 19:01
 # @Author : Vincent Vic
-# @File : CommonResponse.py
+# @File : Response.py
 # @Software: PyCharm
 import json
 

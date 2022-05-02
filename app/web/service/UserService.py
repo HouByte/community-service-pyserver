@@ -5,8 +5,10 @@
 # @Software: PyCharm
 import base64
 import hashlib
+import logging
 
-from common.lib.CommonResponse import Response
+from application import db
+from common.lib.Response import Response
 from web.model.User import User
 
 
@@ -30,6 +32,26 @@ class UserService:
             return Response.failMsg("请输入正确的用户名或密码")
         token = "%s#%s" % (self.geneAuthCode(user_info), user_info.uid)
         return Response.successData("登入成功", token)
+
+    def edit(self, user_info):
+        db.session.add(user_info)
+        db.session.commit()
+        return Response.successMsg("修改成功")
+
+    def resetPwd(self, user_info, data):
+        print(self.genePwd(data['old_password'], user_info.login_salt))
+        if user_info.login_pwd != self.genePwd(data['old_password'], user_info.login_salt):
+            return Response.failMsg("原密码不正确")
+        if self.genePwd(data['new_password'], user_info.login_salt) == self.genePwd(data['old_password'], user_info.login_salt):
+            return Response.failMsg("新密码不能与原密码相同")
+        user_info.login_pwd = self.genePwd(data['new_password'], user_info.login_salt)
+        # 数据库修改
+        db.session.add(user_info)
+        db.session.commit()
+
+        # 重置token
+        token = "%s#%s" % (self.geneAuthCode(user_info), user_info.uid)
+        return Response.successData("修改成功",token)
 
     def geneAuthCode(self, user_info):
         m = hashlib.md5()

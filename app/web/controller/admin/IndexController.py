@@ -5,12 +5,13 @@
 # @Software: PyCharm
 import json
 
-from flask import Blueprint, render_template, request, make_response,redirect
+from flask import Blueprint, request, make_response, redirect, g
 
 from application import app
 from web.service.UserService import UserService
-from common.lib.CommonResponse import Response
+from common.lib.Response import Response
 from common.lib.UrlManager import UrlManager
+from common.lib.Helper import ops_render
 
 page_index = Blueprint('index_page', __name__)
 
@@ -19,13 +20,13 @@ userService = UserService()
 
 @page_index.route("/")
 def index():
-    return render_template('index/index.html')
+    return ops_render('index/index.html')
 
 
 @page_index.route("/login", methods=["GET", "POST"])
 def login():
     if request.method == 'GET':
-        return render_template('user/login.html')
+        return ops_render('user/login.html')
 
     req = request.values;
     login_name = req['login_name'] if 'login_name' in req else ''
@@ -44,6 +45,7 @@ def login():
     response: any = make_response(resp.toJson())
     response.set_cookie(app.config['AUTH_COOKIE_NAME'], resp.data)
     return response
+
 
 @page_index.route("/logout")
 def logout():
