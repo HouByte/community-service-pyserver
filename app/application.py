@@ -19,6 +19,7 @@ if os.path.exists(dotenv_path):
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config['SQLALCHEMY_POOL_RECYCLE'] = -1
 # 基础配置加载
 app.config.from_pyfile('config/base_setting.py')
 # 数据库加载

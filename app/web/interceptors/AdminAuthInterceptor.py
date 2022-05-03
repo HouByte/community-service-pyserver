@@ -8,7 +8,8 @@ import re
 
 from flask import request, redirect, g
 from application import app
-from common.lib.constant import ADMIN_TOKEN_KEY_REDIS
+from common.lib.Helper import getCurrentDate
+from common.lib.constant import ADMIN_TOKEN_KEY_REDIS, ADMIN_LOG_UID_KEY_REDIS
 from common.lib.redis import Redis
 from web.model.User import User
 from web.service.UserService import UserService
@@ -30,6 +31,7 @@ def before_request():
     if "/api" in path:
         return
 
+
     user_info = check_login()
     g.current_user = None
     if user_info:
@@ -40,6 +42,8 @@ def before_request():
 
     if not user_info:
         return redirect(UrlManager.buildUrl('/login'))
+
+    log(user_info['uid'], path)
     return
 
 
@@ -59,10 +63,17 @@ def check_login():
         # if auth_info[0] != userService.geneAuthCode(user_info):
         #     return False
         # return user_info
-        info = Redis.read(ADMIN_TOKEN_KEY_REDIS+token)
+        info = Redis.read(ADMIN_TOKEN_KEY_REDIS + token)
         if not info:
             return False
 
         return json.loads(info)
     except Exception:
         return False
+
+
+def log(uid, url):
+    Redis.hset(ADMIN_LOG_UID_KEY_REDIS+str(uid), getCurrentDate(), url)
+    # 日志记录七天
+    Redis.expire(ADMIN_LOG_UID_KEY_REDIS+str(uid), 60*60*24*7)
+

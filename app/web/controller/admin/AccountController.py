@@ -5,12 +5,12 @@
 # @Software: PyCharm
 import json
 
-from flask import Blueprint, request, redirect,g
+from flask import Blueprint, request, redirect, g
 from common.lib.Helper import ops_render
 from common.lib.Response import Response
 from common.lib.UrlManager import UrlManager
 from common.lib.Utils import isMobile, isEmail, isPwd, isUsername
-from common.lib.constant import ADMIN_UID_KEY_REDIS, ADMIN_TOKEN_KEY_REDIS
+from common.lib.constant import ADMIN_UID_KEY_REDIS, ADMIN_TOKEN_KEY_REDIS, ADMIN_LOG_UID_KEY_REDIS
 from common.lib.redis import Redis
 from web.service.UserService import UserService
 from application import app
@@ -56,6 +56,18 @@ def getUserInfo():
 @page_account.route("/info")
 def info():
     resp_data = getUserInfo()
+    logs = Redis.hgetall(ADMIN_LOG_UID_KEY_REDIS + str(resp_data['user_info'].uid))
+    access_list = []
+    print(logs)
+    if logs:
+        for item in logs.items():
+            log = {
+                'created_time': item[0].decode(),
+                'target_url': item[1].decode()
+            }
+            access_list.append(log)
+    print(access_list)
+    resp_data['access_list'] = access_list
     return ops_render('account/info.html', resp_data)
 
 
