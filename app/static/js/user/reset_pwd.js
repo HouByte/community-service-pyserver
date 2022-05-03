@@ -25,6 +25,15 @@ var mod_pwd_ops = {
                 return false;
             }
 
+
+            //至少6-16个字符，至少1个大写字母，1个小写字母和1个数字
+            var loginPwdReg = !!new_password.match( /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[^]{6,16}$/);
+            //如果登录密码不能通过验证
+            if(!id && loginPwdReg == false){
+                common_ops.alert("请输入符合规范的登录密码(至少6-16个字符，至少1个大写字母，1个小写字母和1个数字)~");
+                return false;
+            }
+
             btn_target.addClass("disabled");
             var data = {
                 old_password: old_password,

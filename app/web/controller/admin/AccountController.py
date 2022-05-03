@@ -9,6 +9,7 @@ from flask import Blueprint, request, redirect,g
 from common.lib.Helper import ops_render
 from common.lib.Response import Response
 from common.lib.UrlManager import UrlManager
+from common.lib.Utils import isMobile, isEmail, isPwd, isUsername
 from common.lib.constant import ADMIN_UID_KEY_REDIS, ADMIN_TOKEN_KEY_REDIS
 from common.lib.redis import Redis
 from web.service.UserService import UserService
@@ -63,8 +64,9 @@ def set():
     if request.method == 'GET':
         req = request.args
         uid = int(req.get('id', 0))
-        info = userService.getUserInfo(uid)
-        if not info:
+        if uid > 0:
+            info = userService.getUserInfo(uid)
+        if uid < 1 or not info:
             info = {
                 'nickname': '',
                 'mobile': '',
@@ -89,18 +91,17 @@ def set():
 
     if nickname is None or len(nickname) < 1:
         return Response.failMsg("请输入符合规范的姓名").toJson()
-    if mobile is None or len(mobile) < 1:
+    if not isMobile(mobile):
         return Response.failMsg("请输入符合规范的手机号码").toJson()
-    if email is None or len(email) < 1:
+    if not isEmail(email):
         return Response.failMsg("请输入符合规范的邮箱").toJson()
-    if login_name is None or len(login_name) < 1:
+    if not isUsername(login_name):
         return Response.failMsg("请输入符合规范的登录用户名").toJson()
-    print(uid)
     # 新增的情况下： 密码能为空，或不能小于6
-    if uid < 1 and (login_pwd is None or len(login_pwd) < 6):
+    if uid < 1 and not isPwd(login_pwd):
         return Response.failMsg("请输入登录密码太弱了，不被允许").toJson()
     # 修改的情况下且密码不为空且小于6，不被允许
-    if uid > 1 and login_pwd.strip() != '' and login_pwd is not None and len(login_pwd) < 6:
+    if uid > 1 and login_pwd.strip() != '' and not isPwd(login_pwd):
         return Response.failMsg("请输入登录密码太弱了，不被允许").toJson()
 
     data = {
@@ -137,7 +138,7 @@ def ops():
         'id': id
     }
     resp = userService.ops(data)
-    if act is 'remove':
+    if act == 'remove':
         # redis 更新数据
         info = userService.getInfoJson(resp.data)
         token = Redis.read(ADMIN_UID_KEY_REDIS + str(info['uid']))

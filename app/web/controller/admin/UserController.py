@@ -10,6 +10,7 @@ from application import app
 from common.lib.Helper import ops_render
 from common.lib.Response import Response
 from common.lib.UrlManager import UrlManager
+from common.lib.Utils import isEmail, isMobile, isPwd
 from common.lib.constant import ADMIN_TOKEN_KEY_REDIS, ADMIN_UID_KEY_REDIS
 from common.lib.redis import Redis
 from web.service.UserService import UserService
@@ -31,9 +32,9 @@ def edit():
 
     if nickname is None or len(nickname) < 1:
         return Response.failMsg("请输入符合规范的姓名").toJson()
-    if mobile is None or len(mobile) < 1:
+    if not isMobile(mobile):
         return Response.failMsg("请输入符合规范的手机号码").toJson()
-    if email is None or len(email) < 1:
+    if not isEmail(email):
         return Response.failMsg("请输入符合规范的邮箱").toJson()
 
     user_info = userService.getUser(g.current_user['uid'])
@@ -65,7 +66,7 @@ def resetPwd():
     req = request.values;
     old_password = req['old_password'] if 'old_password' in req else ''
     new_password = req['new_password'] if 'new_password' in req else ''
-    if old_password is None or len(old_password) < 1 or new_password is None or len(new_password) < 6:
+    if old_password is None or len(old_password) < 1 or not isPwd(new_password):
         return Response.failMsg("修改失败【参数缺少或密码太弱】").toJson()
 
     user_info = g.current_user

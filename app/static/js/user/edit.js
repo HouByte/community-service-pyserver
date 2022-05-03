@@ -29,12 +29,26 @@ var user_edit_ops = {
                 return false;
             }
 
+            var telReg = !!mobile.match(/^(0|86|17951)?(13[0-9]|15[012356789]|17[678]|18[0-9]|14[57])[0-9]{8}$/);
+            //如果手机号码不能通过验证
+            if(telReg == false){
+                common_ops.tip("请输入符合规范的手机号~", mobile_target);
+                return false;
+            }
+
             if (!nickname || nickname.length < 2) {
                 common_ops.tip("请输入符合规范的姓名~", nickname_target);
                 return false;
             }
 
             if (!email || email.length < 2) {
+                common_ops.tip("请输入符合规范的邮箱~", email_target);
+                return false;
+            }
+
+            var emailReg = !!email.match(/^([a-zA-Z0-9_-])+@([a-zA-Z0-9_-])+(.[a-zA-Z0-9_-])+/);
+            //如果邮箱不能通过验证
+            if(emailReg == false){
                 common_ops.tip("请输入符合规范的邮箱~", email_target);
                 return false;
             }

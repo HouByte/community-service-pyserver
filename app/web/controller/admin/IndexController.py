@@ -35,8 +35,8 @@ def login():
     req = request.values;
     login_name = req['login_name'] if 'login_name' in req else ''
     login_pwd = req['login_pwd'] if 'login_pwd' in req else ''
-    if login_name is None or len(login_name) < 1 or login_pwd is None or len(login_pwd) < 1:
-        return Response.failMsg("登入失败【参数缺少】").toJson()
+    if login_name is None or len(login_name) < 4 or login_pwd is None or len(login_pwd) < 6:
+        return Response.failMsg("登入失败【参数缺少或不符合规则】").toJson()
     data = {
         "login_name": login_name,
         "login_pwd": login_pwd
