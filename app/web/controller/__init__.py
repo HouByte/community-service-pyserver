@@ -3,3 +3,6 @@
 # @Author : Vincent Vic
 # @File : __init__.py
 # @Software: PyCharm
+
+import web.controller.admin
+import web.controller.api
