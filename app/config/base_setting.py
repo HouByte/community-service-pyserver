@@ -27,10 +27,3 @@ STATUS_MAPPING = {
     "0": "冻结",
 }
 
-MINA_APP = {
-    "appid": "wx759d38ee4da2062d",
-    "appkey": "fd6661994ed89a5d79d8d6f6999d2931",
-    "paykey": "xxxxxxxxxxxxxx换自己的",
-    "mch_id": "xxxxxxxxxxxx换自己的",
-    "callback_url": "/api/order/callback"
-}
