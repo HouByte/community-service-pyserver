@@ -61,12 +61,8 @@ def info():
     print(logs)
     if logs:
         for item in logs.items():
-            log = {
-                'created_time': item[0].decode(),
-                'target_url': item[1].decode()
-            }
+            log = json.loads(item[1].decode())
             access_list.append(log)
-    print(access_list)
     resp_data['access_list'] = access_list
     return ops_render('account/info.html', resp_data)
 

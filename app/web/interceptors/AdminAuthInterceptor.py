@@ -43,7 +43,7 @@ def before_request():
     if not user_info:
         return redirect(UrlManager.buildUrl('/login'))
 
-    log(user_info['uid'], path)
+    log(user_info['uid'], path, request.args)
     return
 
 
@@ -72,8 +72,14 @@ def check_login():
         return False
 
 
-def log(uid, url):
-    Redis.hset(ADMIN_LOG_UID_KEY_REDIS+str(uid), getCurrentDate(), url)
+def log(uid, url, args):
+    currentDate = getCurrentDate()
+    log = {
+        'created_time': currentDate,
+        'target_url': url,
+        'args': args
+    }
+    Redis.hset(ADMIN_LOG_UID_KEY_REDIS+str(uid), currentDate, json.dumps(log))
     # 日志记录七天
     Redis.expire(ADMIN_LOG_UID_KEY_REDIS+str(uid), 60*60*24*7)
 

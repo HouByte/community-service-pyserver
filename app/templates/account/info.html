@@ -47,6 +47,7 @@
                                     <tr>
                                         <th>访问时间</th>
                                         <th>访问Url</th>
+                                        <th>请求参数</th>
                                     </tr>
                                     </thead>
                                     <tbody>
@@ -55,6 +56,11 @@
                                         <tr>
                                             <td>{{ item.created_time }}</td>
                                             <td>{{ item.target_url }}</td>
+                                            <td>
+                                                {% for key, value in item.args.items() %}
+                                                    {{ key }}={{ value }} <br/>
+                                                {% endfor %}
+                                            </td>
                                         </tr>
                                         {% endfor %}
                                     {% else %}
