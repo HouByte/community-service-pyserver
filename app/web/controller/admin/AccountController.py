@@ -6,7 +6,7 @@
 import json
 
 from flask import Blueprint, request, redirect, g
-from common.lib.Helper import ops_render
+from common.lib.Helper import ops_render, getOpsData
 from common.lib.Response import Response
 from common.lib.UrlManager import UrlManager
 from common.lib.Utils import isMobile, isEmail, isPwd, isUsername
@@ -132,24 +132,20 @@ def set():
 
 @page_account.route("/ops", methods=["POST"])
 def ops():
-    req = request.values
-    act = req['act'] if 'act' in req else None
-    id = req['id'] if 'id' in req else None
-    if not act or not id:
+    data = getOpsData(request.values)
+    if not data['act'] or not data['id']:
         return Response.failMsg("参数错误")
-    if int(id) == 1:
+    if int(data['id']) == 1:
         return Response.failMsg("超级管理员不允许被操作")
     if g.current_user['login_name'] != 'root':
         return Response.failMsg("账户操作只允许超级管理员操作")
-    data = {
-        'act': act,
-        'id': id
-    }
     resp = userService.ops(data)
-    if act == 'remove':
+    if resp.success():
         # redis 更新数据
         info = userService.getInfoJson(resp.data)
         token = Redis.read(ADMIN_UID_KEY_REDIS + str(info['uid']))
-        if token is not None:
+        if data['act'] == 'remove':
+            Redis.delete(ADMIN_TOKEN_KEY_REDIS + token)
+        elif token is not None:
             Redis.write(ADMIN_TOKEN_KEY_REDIS + token, json.dumps(info))
     return resp.toSimpleJson()

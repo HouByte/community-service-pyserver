@@ -11,6 +11,9 @@ var member_index_ops = {
         $(".remove").click(function () {
             that.ops("remove", $(this).attr("data"));
         });
+        $(".lock").click(function () {
+            that.ops("lock", $(this).attr("data"));
+        });
         $(".recover").click(function () {
             that.ops("recover", $(this).attr("data"));
         });
@@ -39,7 +42,19 @@ var member_index_ops = {
             },
             "cancel": null
         };
-        common_ops.confirm((act == "remove" ? "确定删除？" : "确定恢复？"), callback);
+        var tip = ''
+        switch (act) {
+            case 'remove':
+                tip = '确定删除？'
+                break
+            case 'recover':
+                tip = '确定恢复？'
+                break
+            case 'lock':
+                tip = '确定冻结？'
+                break
+        }
+        common_ops.confirm(tip, callback);
     }
 };
 

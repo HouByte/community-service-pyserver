@@ -79,3 +79,21 @@ def ops_render(template, context={}):
 
 def getCurrentDate(format="%Y-%m-%d %H:%M:%S"):
     return datetime.datetime.now().strftime(format)
+
+def getPageParams(req,app):
+    return {
+        'total': 0,
+        'page_size': app.config['PAGE_SIZE'],
+        'page': int(req.get('page', 1)),
+        'display': app.config['PAGE_DISPLAY'],
+        'mix_kw': req.get('mix_kw', ''),
+        'status': req.get('status', -1)
+    }
+
+def getOpsData(req):
+    act = req['act'] if 'act' in req else None
+    id = req['id'] if 'id' in req else None
+    return {
+        'act': act,
+        'id': id
+    }

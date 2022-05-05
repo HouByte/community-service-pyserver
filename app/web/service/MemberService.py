@@ -7,8 +7,10 @@ import hashlib
 import json
 
 import requests
+from sqlalchemy import or_
+
 from application import db
-from common.lib.Helper import getCurrentDate
+from common.lib.Helper import getCurrentDate, Pagination
 from common.lib.Response import Response
 from common.lib.constant import API_TOKEN_KEY_REDIS, API_UID_KEY_REDIS
 from common.lib.redis import Redis
@@ -32,6 +34,10 @@ class MemberService:
         else:
             # 如果__instance有值，则直接返回。
             return cls.__instance
+
+    def getMember(self,mid):
+        return  Member.query.filter_by(id=mid).first()
+
 
     def login(self, code, nickName, avatarUrl, gender, client_type):
         url = "https://api.weixin.qq.com/sns/jscode2session?appid={0}&secret={1}&js_code={2}&grant_type=authorization_code" \
@@ -69,7 +75,9 @@ class MemberService:
             db.session.add(omb)
 
         else:
-            member = Member.query.filter_by(id=omb.member_id).first()
+            member = self.getMember(omb.member_id)
+            if member.status == 0:
+                return Response.failMsg("用户被冻结，无法登入")
             member.nickname = nickName
             member.avatar = avatarUrl
             member.gender = gender
@@ -87,3 +95,48 @@ class MemberService:
         Redis.write(API_UID_KEY_REDIS + str(member.id), token)
 
         return Response.successData("登入成功", info)
+
+    def getMemberList(self, page_params):
+        query = Member.query
+        # 分页处理
+        page_params['total'] = query.count()
+        pages = Pagination(page_params)
+        mix_kw = page_params['mix_kw']
+        # 昵称或手机号码查询
+        if mix_kw != '':
+            rule = or_(Member.nickname.ilike("%{0}%".format(mix_kw)), Member.mobile.ilike("%{0}%".format(mix_kw)))
+            query = query.filter(rule)
+        # 状态查询
+        if int(page_params["status"]) > -1:
+            query = query.filter(Member.status == int(page_params["status"]))
+
+        memberList = query.order_by(Member.id.asc()).all()[pages.getOffset():pages.getLimit()]
+        resp_data = {
+            'list': memberList,
+            "pages": pages.getPages(),
+        }
+        return resp_data
+
+    def ops(self, data):
+        act = data['act']
+        mid = data['id']
+        member = self.getMember(mid)
+        if not member:
+            return Response.failMsg("会员不存在")
+        if act == 'remove':
+            self.remove(mid)
+        elif act == 'lock':
+            member.status = 0
+            self.edit(member)
+        elif act == 'recover':
+            member.status = 1
+            self.edit(member)
+        return Response.successData("操作成功", member.id)
+
+    def remove(self, mid):
+        db.session.query(Member).filter(Member.id == mid).delete()
+        db.session.commit()
+
+    def edit(self, member):
+        db.session.add(member)
+        db.session.commit()
