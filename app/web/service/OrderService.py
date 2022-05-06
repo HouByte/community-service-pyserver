@@ -68,6 +68,9 @@ class OrderService:
         if int(page_params["status"]) > -1:
             query = query.filter(ServiceOrder.status == int(page_params["status"]))
 
+        if int(page_params["nature"]) > -1:
+            query = query.filter(ServiceOrder.snap_nature == int(page_params["nature"]))
+
         serviceList = query.order_by(ServiceOrder.id.asc()).all()[pages.getOffset():pages.getLimit()]
         resp_data = {
             'list': serviceList,

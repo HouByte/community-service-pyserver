@@ -25,6 +25,7 @@ def index():
     page_params = getPageParams(req, app)
     resp_data = orderService.getServiceList(page_params)
     resp_data["status_mapping"] = app.config["STATUS_MAPPING"]
+    resp_data["nature_mapping"] = app.config["NATURE_MAPPING"]
     resp_data["search_con"] = req
     return ops_render('order/index.html', resp_data)
 

@@ -49,7 +49,7 @@ def all_page_exception_handler(e):
         e.code
         return jsonify(code=e.code,msg=e.msg), e.code   # 这些异常类在 Werkzeug 中定义，均继承 HTTPException 类
     if isinstance(e, HTTPException):
-        return e.desciption, e.code
+        return e.name, e.code
     print(e)
     return 'Error', 500  # 一般异常
 

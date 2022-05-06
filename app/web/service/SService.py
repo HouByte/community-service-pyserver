@@ -12,14 +12,7 @@ from sqlalchemy import or_
 from application import db
 from common.lib.APIException import APIParameterException
 from common.lib.Helper import getCurrentDate, Pagination
-from common.lib.CommonResult import CommonResult
-from common.lib.constant import API_TOKEN_KEY_REDIS, API_UID_KEY_REDIS
-from common.lib.redis import Redis
-from config.wexin_setting import MINA_APP
-from web.model.Member import Member
-from web.model.OauthMemberBind import OauthMemberBind
 from web.model.Service import Service
-from web.model.ServiceCategory import ServiceCategory
 from web.service.UserService import UserService
 
 userService = UserService()
@@ -66,7 +59,11 @@ class SService:
             query = query.filter(rule)
         # 状态查询
         if int(page_params["status"]) > -1:
-            query = query.filter(Service.status == int(page_params["status"]))
+            query = query.filter(Service.status == int(page_params["status"]))        # 状态查询
+        if int(page_params["nature"]) > -1:
+            query = query.filter(Service.nature == int(page_params["nature"]))
+        if int(page_params["type"]) > -1:
+            query = query.filter(Service.type == int(page_params["type"]))
 
         serviceList = query.order_by(Service.id.asc()).all()[pages.getOffset():pages.getLimit()]
         resp_data = {

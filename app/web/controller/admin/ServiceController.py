@@ -24,6 +24,8 @@ def index():
     page_params = getPageParams(req, app)
     resp_data = sService.getServiceList(page_params)
     resp_data["status_mapping"] = app.config["STATUS_MAPPING"]
+    resp_data["type_mapping"] = app.config["TYPE_MAPPING"]
+    resp_data["nature_mapping"] = app.config["NATURE_MAPPING"]
     resp_data["search_con"] = req
     return ops_render('service/index.html', resp_data)
 
