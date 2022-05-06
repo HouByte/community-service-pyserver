@@ -64,6 +64,8 @@ class SService:
             query = query.filter(Service.nature == int(page_params["nature"]))
         if int(page_params["type"]) > -1:
             query = query.filter(Service.type == int(page_params["type"]))
+        if int(page_params["category_id"]) > -1:
+            query = query.filter(Service.category == int(page_params["category_id"]))
 
         serviceList = query.order_by(Service.id.asc()).all()[pages.getOffset():pages.getLimit()]
         resp_data = {

@@ -26,6 +26,16 @@
                         </select>
                     </div>
                     <div class="form-group">
+                        <select name="category_id" class="form-control inline">
+                            <option value="-1">请选择分类</option>
+                            {% for category in categorys %}
+                                <option value="{{ category['id'] }}" {% if (category['id'] | string)  ==  search_con.category_id %} selected {% endif %}>
+                                    {{ category['name'] }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-group">
                         <select name="nature" class="form-control inline">
                             <option value="-1">请选择性质</option>
                             {% for tem_key in nature_mapping %}
@@ -68,7 +78,7 @@
                                 <img alt="image" class="img-circle" src="{{ item.snap_cover_image }}"
                                      style="width: 40px;height: 40px;">
                             </td>
-                            <td>{{ item.snap_category }}</td>
+                            <td>{{ categoryMap[item.snap_category] }}</td>
                             <td>
                                 <span>{{ item.snap_title }}</span> |
                                 {% if item.snap_nature == 0 %}

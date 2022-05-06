@@ -17,7 +17,7 @@ from web.service.SService import SService
 
 page_order = Blueprint('order_page', __name__)
 orderService = OrderService()
-
+categoryService=CategoryService()
 
 @page_order.route("/index")
 def index():
@@ -26,6 +26,8 @@ def index():
     resp_data = orderService.getServiceList(page_params)
     resp_data["status_mapping"] = app.config["STATUS_MAPPING"]
     resp_data["nature_mapping"] = app.config["NATURE_MAPPING"]
+    resp_data['categorys'] = categoryService.selectOptions()
+    resp_data['categoryMap'] = categoryService.idMaps()
     resp_data["search_con"] = req
     return ops_render('order/index.html', resp_data)
 

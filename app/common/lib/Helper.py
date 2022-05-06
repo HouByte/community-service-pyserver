@@ -93,7 +93,8 @@ def getPageParams(req,app):
         'mix_kw': req.get('mix_kw', ''),
         'nature': req.get('nature', -1),
         'type': req.get('type', -1),
-        'status': req.get('status', -1)
+        'status': req.get('status', -1),
+        'category_id': req.get('category_id', -1)
     }
 
 def getOpsData(req):

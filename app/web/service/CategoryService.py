@@ -62,6 +62,23 @@ class CategoryService:
         }
         return resp_data
 
+    def selectOptions(self):
+        categorys = ServiceCategory.query.filter(ServiceCategory.status == 1).order_by(ServiceCategory.weight.desc()).all()
+        option = []
+        for category in categorys:
+            option.append({
+                'id': category.id,
+                'name': category.name
+            })
+        return option
+
+    def idMaps(self):
+        categorys = ServiceCategory.query.filter(ServiceCategory.status == 1).order_by(ServiceCategory.weight.desc()).all()
+        map = dict()
+        for category in categorys:
+            map[category.id] = category.name
+        return map
+
     def ops(self, data):
         act = data['act']
         mid = data['id']

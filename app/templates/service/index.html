@@ -26,6 +26,17 @@
                         </select>
                     </div>
                     <div class="form-group">
+                        <select name="category_id" class="form-control inline">
+                            <option value="-1">请选择分类</option>
+                            {% for category in categorys %}
+                                <option value="{{ category['id'] }}" {% if (category['id'] | string) == search_con.category_id %}
+                                        selected {% endif %}>
+                                    {{ category['name'] }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-group">
                         <select name="type" class="form-control inline">
                             <option value="-1">请选择类型</option>
                             {% for tem_key in type_mapping %}
@@ -78,7 +89,7 @@
                                 <img alt="image" class="img-circle" src="{{ item.coverImage }}"
                                      style="width: 40px;height: 40px;">
                             </td>
-                            <td>{{ item.category }}</td>
+                            <td>{{ categoryMap[item.category] }}</td>
                             <td>
                                 <span>{{ item.title }}</span> |
                                 {% if item.type == 0 %}

@@ -17,7 +17,7 @@ class Service(db.Model):
     designatedPlace = db.Column(db.String(255), info='指定地点')
     price = db.Column(db.Numeric(10, 2), nullable=False, info='价格，互助和公益为0')
     p_uid = db.Column(db.Integer, nullable=False, info='发布人id')
-    category = db.Column(db.String(100), nullable=False, info='分类')
+    category = db.Column(db.Integer, nullable=False, info='分类')
     salesVolume = db.Column(db.Integer, info='使用量')
     score = db.Column(db.Integer, info='评分')
     created = db.Column(db.DateTime, server_default=db.FetchedValue(), info='创建时间')
