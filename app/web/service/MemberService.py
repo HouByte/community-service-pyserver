@@ -10,8 +10,9 @@ import requests
 from sqlalchemy import or_
 
 from application import db
+from common.lib.APIException import APIParameterException
 from common.lib.Helper import getCurrentDate, Pagination
-from common.lib.Response import Response
+from common.lib.CommonResult import CommonResult
 from common.lib.constant import API_TOKEN_KEY_REDIS, API_UID_KEY_REDIS
 from common.lib.redis import Redis
 from config.wexin_setting import MINA_APP
@@ -46,7 +47,7 @@ class MemberService:
         wx_resp = json.loads(r.text)
         # 存在errcode 且不是0说明请求失败
         if 'errcode' in wx_resp and wx_resp['errcode'] != 0:
-            return Response.failMsg("微信登入失败:" + wx_resp['errmsg'])
+            raise APIParameterException("微信登入失败:" + wx_resp['errmsg'])
         openid = wx_resp['openid']
         session_key = wx_resp['session_key']
 
@@ -77,7 +78,7 @@ class MemberService:
         else:
             member = self.getMember(omb.member_id)
             if member.status == 0:
-                return Response.failMsg("用户被冻结，无法登入")
+                raise APIParameterException("用户被冻结，无法登入")
             member.nickname = nickName
             member.avatar = avatarUrl
             member.gender = gender
@@ -94,7 +95,7 @@ class MemberService:
         Redis.write(API_TOKEN_KEY_REDIS + token, json.dumps(info))
         Redis.write(API_UID_KEY_REDIS + str(member.id), token)
 
-        return Response.successData("登入成功", info)
+        return info
 
     def getMemberList(self, page_params):
         query = Member.query
@@ -122,16 +123,19 @@ class MemberService:
         mid = data['id']
         member = self.getMember(mid)
         if not member:
-            return Response.failMsg("会员不存在")
+            raise APIParameterException("会员不存在")
         if act == 'remove':
             self.remove(mid)
         elif act == 'lock':
-            member.status = 0
-            self.edit(member)
+            self.updateStatus(mid, 0)
         elif act == 'recover':
-            member.status = 1
-            self.edit(member)
-        return Response.successData("操作成功", member.id)
+            self.updateStatus(mid, 1)
+        db.session.commit()
+        return member.id
+
+    def updateStatus(self, mid, status):
+        db.session.query(Member).filter_by(id=mid).update({'status': status, 'updated_time': getCurrentDate()})
+
 
     def remove(self, mid):
         db.session.query(Member).filter(Member.id == mid).delete()

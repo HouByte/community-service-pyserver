@@ -13,7 +13,7 @@ from common.lib.Utils import ObjToJson
 from common.lib.constant import ADMIN_TOKEN_KEY_REDIS, ADMIN_UID_KEY_REDIS
 from common.lib.redis import Redis
 from web.service.UserService import UserService
-from common.lib.Response import Response
+from common.lib.CommonResult import CommonResult
 from common.lib.UrlManager import UrlManager
 from common.lib.Helper import ops_render
 
@@ -36,23 +36,16 @@ def login():
     login_name = req['login_name'] if 'login_name' in req else ''
     login_pwd = req['login_pwd'] if 'login_pwd' in req else ''
     if login_name is None or len(login_name) < 4 or login_pwd is None or len(login_pwd) < 6:
-        return Response.failMsg("登入失败【参数缺少或不符合规则】").toJson()
+        return CommonResult.failMsg("登入失败【参数缺少或不符合规则】")
     data = {
         "login_name": login_name,
         "login_pwd": login_pwd
     }
-    resp  = userService.login(data)
-    if not resp:
-        return resp.toJson()
-    if not resp.isSuccess():
-        return resp.toJson()
-    cookieResponse = make_response(Response.successMsg("登入成功").toJson())
-
-    user_info = resp.data
+    user_info = userService.login(data)
+    cookieResponse = make_response(CommonResult.successMsg("登入成功"))
+    # token 记录
     token = str(uuid.uuid4())
-
     info = userService.getInfoJson(user_info)
-
     Redis.write(ADMIN_TOKEN_KEY_REDIS+token, json.dumps(info))
     Redis.write(ADMIN_UID_KEY_REDIS+str(user_info.uid), token)
     # cookie 存储token 1天

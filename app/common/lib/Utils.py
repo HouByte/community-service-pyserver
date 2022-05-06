@@ -9,7 +9,7 @@ import re
 
 
 def ObjToJson(obj):
-    return json.dumps(obj, default=lambda obj: obj.__dict__, indent=4, sort_keys=True, ensure_ascii=False)
+    return json.dumps(obj)
 
 
 seq = "zxcvbnmsadfghjklqwertyuiop12345678901234567890123456789012345678901234567890"

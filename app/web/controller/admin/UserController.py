@@ -6,9 +6,9 @@
 import json
 
 from flask import Blueprint, request, g, make_response, redirect
-from application import app
+from common.lib.APIException import APIParameterException
 from common.lib.Helper import ops_render
-from common.lib.Response import Response
+from common.lib.CommonResult import CommonResult
 from common.lib.UrlManager import UrlManager
 from common.lib.Utils import isEmail, isMobile, isPwd
 from common.lib.constant import ADMIN_TOKEN_KEY_REDIS, ADMIN_UID_KEY_REDIS
@@ -31,21 +31,21 @@ def edit():
     sex = req['sex'] if 'sex' in req else ''
 
     if nickname is None or len(nickname) < 1:
-        return Response.failMsg("请输入符合规范的姓名").toJson()
+        raise APIParameterException("请输入符合规范的姓名").toJson()
     if not isMobile(mobile):
-        return Response.failMsg("请输入符合规范的手机号码").toJson()
+        raise APIParameterException("请输入符合规范的手机号码").toJson()
     if not isEmail(email):
-        return Response.failMsg("请输入符合规范的邮箱").toJson()
+        raise APIParameterException("请输入符合规范的邮箱").toJson()
 
     user_info = userService.getUser(g.current_user['uid'])
     if not user_info:
-        return Response.failMsg("用户不存在")
+        raise APIParameterException("用户不存在")
     user_info.nickname = nickname
     user_info.email = email
     user_info.mobile = mobile
     user_info.sex = sex
 
-    resp = userService.edit(user_info)
+    userService.edit(user_info)
 
     # redis 更新数据
     info = userService.getInfoJson(user_info)
@@ -55,7 +55,7 @@ def edit():
         return redirect(UrlManager.buildUrl('/login'))
     Redis.write(ADMIN_TOKEN_KEY_REDIS + token, json.dumps(info))
 
-    return resp.toSimpleJson()
+    return CommonResult.successMsg("更新成功")
 
 
 @page_user.route("/reset-pwd", methods=["GET", "POST"])
@@ -67,18 +67,12 @@ def resetPwd():
     old_password = req['old_password'] if 'old_password' in req else ''
     new_password = req['new_password'] if 'new_password' in req else ''
     if old_password is None or len(old_password) < 1 or not isPwd(new_password):
-        return Response.failMsg("修改失败【参数缺少或密码太弱】").toJson()
+        raise APIParameterException("修改失败【参数缺少或密码太弱】")
 
     user_info = g.current_user
     data = {
         "old_password": old_password,
         "new_password": new_password
     }
-    resp = userService.resetPwd(user_info, data)
-    if not resp:
-        return resp.toJson()
-    if not resp.isSuccess():
-        return resp.toJson()
-    response: any = make_response(resp.toJson())
-    response.set_cookie(app.config['AUTH_COOKIE_NAME'], resp.data)
-    return response
+    userService.resetPwd(user_info, data)
+    return CommonResult.successMsg("更新成功")

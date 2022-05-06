@@ -37,7 +37,8 @@ var member_index_ops = {
                             }
                         }
                         common_ops.alert(res.msg, callback);
-                    }
+                    },
+                    error:common_ops.errorHandle
                 });
             },
             "cancel": null

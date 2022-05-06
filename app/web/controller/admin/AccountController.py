@@ -6,8 +6,10 @@
 import json
 
 from flask import Blueprint, request, redirect, g
+
+from common.lib.APIException import APIParameterException
 from common.lib.Helper import ops_render, getOpsData
-from common.lib.Response import Response
+from common.lib.CommonResult import CommonResult
 from common.lib.UrlManager import UrlManager
 from common.lib.Utils import isMobile, isEmail, isPwd, isUsername
 from common.lib.constant import ADMIN_UID_KEY_REDIS, ADMIN_TOKEN_KEY_REDIS, ADMIN_LOG_UID_KEY_REDIS
@@ -98,19 +100,19 @@ def set():
     sex = req['sex'] if 'sex' in req else 0
 
     if nickname is None or len(nickname) < 1:
-        return Response.failMsg("请输入符合规范的姓名").toJson()
+        raise APIParameterException("请输入符合规范的姓名").toJson()
     if not isMobile(mobile):
-        return Response.failMsg("请输入符合规范的手机号码").toJson()
+        raise APIParameterException("请输入符合规范的手机号码").toJson()
     if not isEmail(email):
-        return Response.failMsg("请输入符合规范的邮箱").toJson()
+        raise APIParameterException("请输入符合规范的邮箱").toJson()
     if not isUsername(login_name):
-        return Response.failMsg("请输入符合规范的登录用户名").toJson()
+        raise APIParameterException("请输入符合规范的登录用户名").toJson()
     # 新增的情况下： 密码能为空，或不能小于6
     if uid < 1 and not isPwd(login_pwd):
-        return Response.failMsg("请输入登录密码太弱了，不被允许").toJson()
+        raise APIParameterException("请输入登录密码太弱了，不被允许").toJson()
     # 修改的情况下且密码不为空且小于6，不被允许
     if uid > 1 and login_pwd.strip() != '' and not isPwd(login_pwd):
-        return Response.failMsg("请输入登录密码太弱了，不被允许").toJson()
+        raise APIParameterException("请输入登录密码太弱了，不被允许").toJson()
 
     data = {
         'nickname': nickname,
@@ -121,31 +123,30 @@ def set():
         'sex': sex,
         'uid': uid
     }
-    resp = userService.set(data)
+    model_user = userService.set(data)
     # redis 更新数据
-    info = userService.getInfoJson(resp.data)
+    info = userService.getInfoJson(model_user)
     token = Redis.read(ADMIN_UID_KEY_REDIS + str(info['uid']))
     if token is not None:
         Redis.write(ADMIN_TOKEN_KEY_REDIS + token, json.dumps(info))
-    return resp.toSimpleJson()
+    return CommonResult.successMsg("更新成功")
 
 
 @page_account.route("/ops", methods=["POST"])
 def ops():
     data = getOpsData(request.values)
     if not data['act'] or not data['id']:
-        return Response.failMsg("参数错误")
+        raise APIParameterException("参数错误")
     if int(data['id']) == 1:
-        return Response.failMsg("超级管理员不允许被操作")
+        raise APIParameterException("超级管理员不允许被操作")
     if g.current_user['login_name'] != 'root':
-        return Response.failMsg("账户操作只允许超级管理员操作")
-    resp = userService.ops(data)
-    if resp.success():
-        # redis 更新数据
-        info = userService.getInfoJson(resp.data)
-        token = Redis.read(ADMIN_UID_KEY_REDIS + str(info['uid']))
-        if data['act'] == 'remove':
-            Redis.delete(ADMIN_TOKEN_KEY_REDIS + token)
-        elif token is not None:
-            Redis.write(ADMIN_TOKEN_KEY_REDIS + token, json.dumps(info))
-    return resp.toSimpleJson()
+        raise APIParameterException("账户操作只允许超级管理员操作")
+    user_info = userService.ops(data)
+    # redis 更新数据
+    info = userService.getInfoJson(user_info)
+    token = Redis.read(ADMIN_UID_KEY_REDIS + str(info['uid']))
+    if data['act'] == 'remove':
+        Redis.delete(ADMIN_TOKEN_KEY_REDIS + token)
+    elif token is not None:
+        Redis.write(ADMIN_TOKEN_KEY_REDIS + token, json.dumps(info))
+    return CommonResult.successMsg("更新成功")

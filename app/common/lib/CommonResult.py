@@ -5,39 +5,38 @@
 # @Software: PyCharm
 import json
 
+from flask import jsonify
+
+from application import db
 from common.lib.Utils import ObjToJson
 
 
-class Response:
+class CommonResult:
 
-    def __init__(self, code, msg, data=None):
-        self.code = code
-        self.msg = msg
-        self.data = data
 
     @staticmethod
     def success():
-        return Response(200, 'success')
+        return jsonify(code=200, msg='success')
 
     @staticmethod
     def successMsg(msg):
-        return Response(200, msg)
+        return jsonify(code=200, msg=msg)
 
     @staticmethod
     def successData(msg, data):
-        return Response(200, msg, data)
+        return jsonify(code=200, msg=msg,data=dict(data))
 
     @staticmethod
     def fail():
-        return Response(-1, 'fail')
+        return jsonify(code=-1, msg='fail')
 
     @staticmethod
     def failMsg(msg):
-        return Response(-1, msg)
+        return jsonify(code=-1, msg=msg)
 
     @staticmethod
     def build(code, msg, data):
-        return Response(code, msg, data)
+        return jsonify(code=code, msg=msg, data=jsonify(data))
 
     def toJson(self):
         return ObjToJson(self)
@@ -49,5 +48,8 @@ class Response:
         }
         return info
 
-    def isSuccess(self):
-        return  self.code == 200
+    def keys(self):
+        return ['code', 'msg', 'data']
+
+    def __getitem__(self, item):
+        return getattr(self, item)

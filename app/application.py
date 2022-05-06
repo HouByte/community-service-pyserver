@@ -3,14 +3,14 @@
 # @Author : Vincent Vic
 # @File : application.py
 # @Software: PyCharm
-import logging
-
 import redis
-from flask import Flask
+from flask import Flask, jsonify
 from flask_sqlalchemy import SQLAlchemy
 import os
 from dotenv import load_dotenv
+from werkzeug.exceptions import HTTPException
 
+from common.lib.APIException import APIException
 from common.lib.UrlManager import UrlManager
 
 dotenv_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), '.flaskenv')
@@ -39,3 +39,18 @@ r_db = redis.StrictRedis(redis_host, redis_port, redis_db)
 # 模板全局方法
 app.add_template_global(UrlManager.buildStaticUrl, 'buildStaticUrl')
 app.add_template_global(UrlManager.buildUrl, 'buildUrl')
+
+
+@app.errorhandler(Exception)
+def all_page_exception_handler(e):
+    # 对于 HTTP 异常，返回自带的错误描述和状态码
+    # 这些异常类在 Werkzeug 中定义，均继承 HTTPException 类
+    if isinstance(e, APIException):
+        e.code
+        return jsonify(code=e.code,msg=e.msg), e.code   # 这些异常类在 Werkzeug 中定义，均继承 HTTPException 类
+    if isinstance(e, HTTPException):
+        return e.desciption, e.code
+    print(e)
+    return 'Error', 500  # 一般异常
+
+

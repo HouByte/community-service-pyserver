@@ -7,7 +7,8 @@ import base64
 import hashlib
 from sqlalchemy import or_
 from application import db, app
-from common.lib.Response import Response
+from common.lib.APIException import APIException, APIAuthFailed, APIForbidden, APIParameterException
+from common.lib.CommonResult import CommonResult
 from common.lib.Helper import Pagination, getCurrentDate
 from common.lib.Utils import getRandomKey
 from web.model.User import User
@@ -28,12 +29,14 @@ class UserService:
     def login(self, data):
         user_info = User.query.filter_by(login_name=data['login_name']).first()
         if not user_info:
-            return Response.failMsg("请输入正确的用户名或密码")
+            raise APIAuthFailed('请输入正确的用户名或密码')
+            # return CommonResult.failMsg("请输入正确的用户名或密码")
         if user_info.login_pwd != self.genePwd(data['login_pwd'], user_info.login_salt):
-            return Response.failMsg("请输入正确的用户名或密码")
+            raise APIAuthFailed('请输入正确的用户名或密码')
+            # return CommonResult.failMsg("请输入正确的用户名或密码")
         if user_info.status == 0:
-            return Response.failMsg("账号被冻结~")
-        return Response.successData("登入成功", user_info)
+            raise APIAuthFailed("账号被冻结~")
+        return user_info
 
     def getInfoJson(self, user_info):
         info = {
@@ -90,12 +93,11 @@ class UserService:
         user_info.updated_time = getCurrentDate()
         db.session.add(user_info)
         db.session.commit()
-        return Response.successMsg("修改成功")
 
     def set(self, data):
         has_in = User.query.filter(User.login_name == data['login_name'], User.uid != data['uid']).first()
         if has_in:
-            return Response.failMsg("该登录名已存在，请换一个试试~~")
+            raise APIForbidden("该登录名已存在，请换一个试试~~")
 
         user_info = User.query.filter_by(uid=data['uid']).first()
         # 用户存在的情况下
@@ -118,7 +120,7 @@ class UserService:
 
         # 修改或新增
         self.edit(model_user)
-        return Response.successData("操作成功", model_user)
+        return model_user
 
     def updatePwd(self, user_info, new_password):
         user_info.updated_time = getCurrentDate()
@@ -129,16 +131,11 @@ class UserService:
 
     def resetPwd(self, user_info, data):
         if user_info.login_pwd != self.genePwd(data['old_password'], user_info.login_salt):
-            return Response.failMsg("原密码不正确")
-        if self.genePwd(data['new_password'], user_info.login_salt) == self.genePwd(data['old_password'],
-                                                                                    user_info.login_salt):
-            return Response.failMsg("新密码不能与原密码相同")
+            raise APIParameterException("原密码不正确")
+        if self.genePwd(data['new_password'], user_info.login_salt) == self.genePwd(data['old_password'], user_info.login_salt):
+            raise APIParameterException("新密码不能与原密码相同")
         # 更新密码
         self.updatePwd(user_info, data['new_password'])
-
-        # 重置token
-        token = "%s#%s" % (self.geneAuthCode(user_info), user_info.uid)
-        return Response.successData("操作成功", token)
 
     def remove(self, uid):
         db.session.query(User).filter(User.uid == uid).delete()
@@ -149,16 +146,18 @@ class UserService:
         uid = data['id']
         user_info = self.getUserInfo(uid)
         if not user_info:
-            return Response.failMsg("用户不存在")
+            raise APIParameterException("用户不存在")
         if act == 'remove':
             self.remove(uid)
         elif act == 'lock':
-            user_info.status = 0
-            self.edit(user_info)
+            self.updateStatus(uid, 0)
         elif act == 'recover':
-            user_info.status = 1
-            self.edit(user_info)
-        return Response.successData("操作成功", user_info)
+            self.updateStatus(uid, 1)
+        db.session.commit()
+        return user_info
+
+    def updateStatus(self, uid, status):
+        db.session.query(User).filter_by(uid=uid).update({'status': status, 'updated_time': getCurrentDate()})
 
     def geneAuthCode(self, user_info):
         m = hashlib.md5()

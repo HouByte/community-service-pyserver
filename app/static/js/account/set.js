@@ -103,7 +103,7 @@ var account_set_ops = {
 
 
 
-            btn_target.addClass("disabled");
+            //btn_target.addClass("disabled");
 
             var data = {
                 nickname: nickname,
@@ -121,7 +121,7 @@ var account_set_ops = {
                 data: data,
                 dataType: "json",
                 success: function (res) {
-                    btn_target.removeClass("disabled");
+                    //btn_target.removeClass("disabled");
                     var callback = null;
                     if (res.code == 200) {
                         callback = function () {
@@ -129,7 +129,8 @@ var account_set_ops = {
                         }
                     }
                     common_ops.alert(res.msg, callback);
-                }
+                },
+                error:common_ops.errorHandle
             })
 
         });

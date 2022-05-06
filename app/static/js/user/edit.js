@@ -77,7 +77,8 @@ var user_edit_ops = {
                         }
                     }
                     common_ops.alert(res.msg, callback);
-                }
+                },
+                error:common_ops.errorHandle
             })
 
         });

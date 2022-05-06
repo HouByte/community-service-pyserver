@@ -86,16 +86,16 @@ var common_ops = {
             nav_name = "member";
         }
 
-        if (pathname.indexOf("/finance") > -1) {
-            nav_name = "finance";
+        if (pathname.indexOf("/category") > -1) {
+            nav_name = "category";
         }
 
-        if (pathname.indexOf("/qrcode") > -1) {
-            nav_name = "market";
+        if (pathname.indexOf("/service") > -1) {
+            nav_name = "service";
         }
 
-        if (pathname.indexOf("/stat") > -1) {
-            nav_name = "stat";
+        if (pathname.indexOf("/order") > -1) {
+            nav_name = "order";
         }
 
         if (nav_name == null) {
@@ -161,6 +161,12 @@ var common_ops = {
         var domain = $(".hidden_layout_wrap input[name=domain]").val();
         var prefix_url = $(".hidden_layout_wrap input[name=prefix_url]").val();
         return domain + prefix_url + img_key
+    },
+    errorHandle: function(err_msg,state,errorThrown){
+        common_ops.alert(err_msg.responseJSON.msg);
+        if (state === 401){
+            window.location.href = common_ops.buildUrl("/login");
+        }
     }
 };
 

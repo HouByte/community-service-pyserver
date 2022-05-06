@@ -34,12 +34,14 @@ var user_login_ops = {
                     btn_target.removeClass("disabled");
                     var callback = null;
                     if (res.code == 200) {
-                        callback = function () {
-                            window.location.href = common_ops.buildUrl("/");
-                        }
+                        window.location.href = common_ops.buildUrl("/");
                     }
-                    common_ops.alert(res.msg, callback);
+                },
+                error:function(err_msg,state,errorThrown){
+                    common_ops.alert(err_msg.responseJSON.msg);
+                    btn_target.removeClass("disabled")
                 }
+
             });
         });
     }

@@ -33,6 +33,7 @@ def before_request():
 
 
     user_info = check_login()
+
     g.current_user = None
     if user_info:
         g.current_user = user_info

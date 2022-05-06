@@ -13,3 +13,9 @@ class Member(db.Model):
     status = db.Column(db.Integer, nullable=False, server_default=db.FetchedValue(), info='1:有效 0：无效')
     updated_time = db.Column(db.DateTime, nullable=False, server_default=db.FetchedValue(), info='最后一次时间')
     created_time = db.Column(db.DateTime, nullable=False, server_default=db.FetchedValue(), info='插入时间')
+
+    def keys(self):
+        return ['id', 'nickname', 'mobile', 'gender', 'avatar', 'status', 'updated_time', 'created_time']
+
+    def __getitem__(self, item):
+        return getattr(self, item)

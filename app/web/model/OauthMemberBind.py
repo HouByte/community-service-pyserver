@@ -17,3 +17,9 @@ class OauthMemberBind(db.Model):
     extra = db.Column(db.Text, nullable=False, info='额外字段')
     updated_time = db.Column(db.DateTime, nullable=False, server_default=db.FetchedValue(), info='最后更新时间')
     created_time = db.Column(db.DateTime, nullable=False, server_default=db.FetchedValue(), info='插入时间')
+
+    def keys(self):
+        return ['id', 'member_id', 'type', 'client_type', 'unionid', 'extra', 'openid', 'updated_time', 'created_time']
+
+    def __getitem__(self, item):
+        return getattr(self, item)

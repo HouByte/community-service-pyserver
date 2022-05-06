@@ -8,7 +8,7 @@ import json
 import requests
 from flask import Blueprint, request
 from application import app
-from common.lib.Response import Response
+from common.lib.CommonResult import CommonResult
 from config.wexin_setting import MINA_APP
 from web.service.MemberService import MemberService
 
@@ -26,12 +26,13 @@ def login():
     req = request.values;
     code = req['code'] if 'code' in req else ''
     if code is None or len(code) < 1:
-        return Response.failMsg("未提供授权code").toJson()
+        return CommonResult.failMsg("未提供授权code").toJson()
     nickName = req['nickName'] if 'nickName' in req else ''
     avatarUrl = req['avatarUrl'] if 'avatarUrl' in req else ''
     gender = req['gender'] if 'gender' in req else ''
     client_type = req['client_type'] if 'client_type' in req else 'wechat'
-    return memberService.login(code,nickName,avatarUrl,gender,client_type).toJson()
+    info = memberService.login(code, nickName, avatarUrl, gender, client_type)
+    return CommonResult.successData("登入成功", info)
 
 
 

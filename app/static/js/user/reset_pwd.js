@@ -34,7 +34,7 @@ var mod_pwd_ops = {
                 return false;
             }
 
-            btn_target.addClass("disabled");
+           // btn_target.addClass("disabled");
             var data = {
                 old_password: old_password,
                 new_password: new_password
@@ -46,7 +46,7 @@ var mod_pwd_ops = {
                 data: data,
                 dataType: "json",
                 success: function (res) {
-                    btn_target.removeClass("disabled");
+                    //btn_target.removeClass("disabled");
                     var callback = null;
                     if (res.code == 200) {
                         callback = function () {
@@ -54,7 +54,8 @@ var mod_pwd_ops = {
                         }
                     }
                     common_ops.alert(res.msg, callback);
-                }
+                },
+                error:common_ops.errorHandle
             })
 
         });

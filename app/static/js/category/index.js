@@ -1,5 +1,5 @@
 ;
-var account_index_ops = {
+var member_index_ops = {
     init: function () {
         this.eventBind();
     },
@@ -22,7 +22,7 @@ var account_index_ops = {
         var callback = {
             "ok": function () {
                 $.ajax({
-                    url: common_ops.buildUrl("/account/ops"),
+                    url: common_ops.buildUrl("/category/ops"),
                     type: "POST",
                     data: {
                         act: act,
@@ -43,7 +43,7 @@ var account_index_ops = {
             },
             "cancel": null
         };
-        tip = ''
+        var tip = ''
         switch (act) {
             case 'remove':
                 tip = '确定删除？'
@@ -52,7 +52,7 @@ var account_index_ops = {
                 tip = '确定恢复？'
                 break
             case 'lock':
-                tip = '确定冻结？'
+                tip = '确定禁用？'
                 break
         }
         common_ops.confirm(tip, callback);
@@ -60,5 +60,5 @@ var account_index_ops = {
 };
 
 $(document).ready(function () {
-    account_index_ops.init();
+    member_index_ops.init();
 });

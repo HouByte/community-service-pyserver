@@ -5,11 +5,15 @@
 # @Software: PyCharm
 # 统一渲染方法
 import datetime
-
-from flask import render_template, g
 import math
 
-from common.lib.Utils import ObjToJson
+from flask import render_template, g
+
+
+def serialize(model):
+    from sqlalchemy.orm import class_mapper
+    columns = [c.key for c in class_mapper(model.__class__).columns]
+    return dict((c, getattr(model, c)) for c in columns)
 
 '''
 自定义分页类
