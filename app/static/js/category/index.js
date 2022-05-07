@@ -55,6 +55,7 @@ var member_index_ops = {
                 tip = '确定禁用？'
                 break
         }
+
         common_ops.confirm(tip, callback);
     }
 };

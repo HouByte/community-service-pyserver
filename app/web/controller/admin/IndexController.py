@@ -6,16 +6,15 @@
 import json
 import uuid
 
-from flask import Blueprint, request, make_response, redirect, g
+from flask import Blueprint, request, make_response, redirect
 
 from application import app
-from common.lib.Utils import ObjToJson
+from common.lib.CommonResult import CommonResult
+from common.lib.Helper import ops_render
+from common.lib.UrlManager import UrlManager
 from common.lib.constant import ADMIN_TOKEN_KEY_REDIS, ADMIN_UID_KEY_REDIS
 from common.lib.redis import Redis
 from web.service.UserService import UserService
-from common.lib.CommonResult import CommonResult
-from common.lib.UrlManager import UrlManager
-from common.lib.Helper import ops_render
 
 page_index = Blueprint('index_page', __name__)
 

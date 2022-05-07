@@ -5,10 +5,11 @@
 # @Software: PyCharm
 import base64
 import hashlib
+
 from sqlalchemy import or_
-from application import db, app
-from common.lib.APIException import APIException, APIAuthFailed, APIForbidden, APIParameterException
-from common.lib.CommonResult import CommonResult
+
+from application import db
+from common.lib.APIException import APIAuthFailed, APIForbidden, APIParameterException
 from common.lib.Helper import Pagination, getCurrentDate
 from common.lib.Utils import getRandomKey
 from web.model.User import User

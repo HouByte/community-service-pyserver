@@ -12,7 +12,6 @@ from sqlalchemy import or_
 from application import db
 from common.lib.APIException import APIParameterException
 from common.lib.Helper import getCurrentDate, Pagination
-from common.lib.CommonResult import CommonResult
 from common.lib.constant import API_TOKEN_KEY_REDIS, API_UID_KEY_REDIS
 from common.lib.redis import Redis
 from config.wexin_setting import MINA_APP

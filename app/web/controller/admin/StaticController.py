@@ -5,6 +5,7 @@
 # @Software: PyCharm
 
 from flask import Blueprint, send_from_directory
+
 from application import app
 
 page_static = Blueprint('static', __name__)

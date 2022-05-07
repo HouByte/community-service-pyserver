@@ -5,10 +5,11 @@
 # @Software: PyCharm
 import json
 
-from flask import Blueprint, request, g, make_response, redirect
+from flask import Blueprint, request, g, redirect
+
 from common.lib.APIException import APIParameterException
-from common.lib.Helper import ops_render
 from common.lib.CommonResult import CommonResult
+from common.lib.Helper import ops_render
 from common.lib.UrlManager import UrlManager
 from common.lib.Utils import isEmail, isMobile, isPwd
 from common.lib.constant import ADMIN_TOKEN_KEY_REDIS, ADMIN_UID_KEY_REDIS
@@ -31,11 +32,11 @@ def edit():
     sex = req['sex'] if 'sex' in req else ''
 
     if nickname is None or len(nickname) < 1:
-        raise APIParameterException("请输入符合规范的姓名").toJson()
+        raise APIParameterException("请输入符合规范的姓名")
     if not isMobile(mobile):
-        raise APIParameterException("请输入符合规范的手机号码").toJson()
+        raise APIParameterException("请输入符合规范的手机号码")
     if not isEmail(email):
-        raise APIParameterException("请输入符合规范的邮箱").toJson()
+        raise APIParameterException("请输入符合规范的邮箱")
 
     user_info = userService.getUser(g.current_user['uid'])
     if not user_info:

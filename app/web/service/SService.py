@@ -3,10 +3,7 @@
 # @Author : Vincent Vic
 # @File : CategoryService.py
 # @Software: PyCharm
-import hashlib
-import json
 
-import requests
 from sqlalchemy import or_
 
 from application import db

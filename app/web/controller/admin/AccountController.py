@@ -7,15 +7,15 @@ import json
 
 from flask import Blueprint, request, redirect, g
 
+from application import app
 from common.lib.APIException import APIParameterException
-from common.lib.Helper import ops_render, getOpsData
 from common.lib.CommonResult import CommonResult
+from common.lib.Helper import ops_render, getOpsData
 from common.lib.UrlManager import UrlManager
 from common.lib.Utils import isMobile, isEmail, isPwd, isUsername
 from common.lib.constant import ADMIN_UID_KEY_REDIS, ADMIN_TOKEN_KEY_REDIS, ADMIN_LOG_UID_KEY_REDIS
 from common.lib.redis import Redis
 from web.service.UserService import UserService
-from application import app
 
 page_account = Blueprint('account_page', __name__)
 
@@ -100,19 +100,19 @@ def set():
     sex = req['sex'] if 'sex' in req else 0
 
     if nickname is None or len(nickname) < 1:
-        raise APIParameterException("请输入符合规范的姓名").toJson()
+        raise APIParameterException("请输入符合规范的姓名")
     if not isMobile(mobile):
-        raise APIParameterException("请输入符合规范的手机号码").toJson()
+        raise APIParameterException("请输入符合规范的手机号码")
     if not isEmail(email):
-        raise APIParameterException("请输入符合规范的邮箱").toJson()
+        raise APIParameterException("请输入符合规范的邮箱")
     if not isUsername(login_name):
-        raise APIParameterException("请输入符合规范的登录用户名").toJson()
+        raise APIParameterException("请输入符合规范的登录用户名")
     # 新增的情况下： 密码能为空，或不能小于6
     if uid < 1 and not isPwd(login_pwd):
-        raise APIParameterException("请输入登录密码太弱了，不被允许").toJson()
+        raise APIParameterException("请输入登录密码太弱了，不被允许")
     # 修改的情况下且密码不为空且小于6，不被允许
     if uid > 1 and login_pwd.strip() != '' and not isPwd(login_pwd):
-        raise APIParameterException("请输入登录密码太弱了，不被允许").toJson()
+        raise APIParameterException("请输入登录密码太弱了，不被允许")
 
     data = {
         'nickname': nickname,

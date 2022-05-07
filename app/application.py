@@ -4,13 +4,14 @@
 # @File : application.py
 # @Software: PyCharm
 import redis
-from flask import Flask, jsonify
+from flask import Flask, jsonify, request
 from flask_sqlalchemy import SQLAlchemy
 import os
 from dotenv import load_dotenv
 from werkzeug.exceptions import HTTPException
 
 from common.lib.APIException import APIException
+from common.lib.Helper import ops_render
 from common.lib.UrlManager import UrlManager
 
 dotenv_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), '.flaskenv')
@@ -43,14 +44,21 @@ app.add_template_global(UrlManager.buildUrl, 'buildUrl')
 
 @app.errorhandler(Exception)
 def all_page_exception_handler(e):
-    # 对于 HTTP 异常，返回自带的错误描述和状态码
-    # 这些异常类在 Werkzeug 中定义，均继承 HTTPException 类
+    path = request.path
+
+
     if isinstance(e, APIException):
         e.code
         return jsonify(code=e.code,msg=e.msg), e.code   # 这些异常类在 Werkzeug 中定义，均继承 HTTPException 类
+    # 对于 HTTP 异常，返回自带的错误描述和状态码
+    # 这些异常类在 Werkzeug 中定义，均继承 HTTPException 类
     if isinstance(e, HTTPException):
-        return e.name, e.code
-    print(e)
-    return 'Error', 500  # 一般异常
+        if path.startswith("/api"):
+            return jsonify(code=e.code,msg="请求异常请稍后再试"), e.code
+        return ops_render('error/error.html'), e.code
+    print(request.path)
+    if path.startswith("/api"):
+        return jsonify(code=e.code, msg="服务器异常请稍后再试"), 500
+    return ops_render('error/error.html'), 500  # 一般异常
 
 

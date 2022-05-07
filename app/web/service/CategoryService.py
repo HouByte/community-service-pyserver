@@ -3,21 +3,12 @@
 # @Author : Vincent Vic
 # @File : CategoryService.py
 # @Software: PyCharm
-import hashlib
-import json
 
-import requests
 from sqlalchemy import or_
 
 from application import db
-from common.lib.APIException import APIParameterException
+from common.lib.APIException import APIParameterException, APIForbidden
 from common.lib.Helper import getCurrentDate, Pagination
-from common.lib.CommonResult import CommonResult
-from common.lib.constant import API_TOKEN_KEY_REDIS, API_UID_KEY_REDIS
-from common.lib.redis import Redis
-from config.wexin_setting import MINA_APP
-from web.model.Member import Member
-from web.model.OauthMemberBind import OauthMemberBind
 from web.model.ServiceCategory import ServiceCategory
 
 
@@ -103,3 +94,16 @@ class CategoryService:
     def edit(self, category):
         db.session.add(category)
         db.session.commit()
+
+    def set(self, data):
+        has_in = ServiceCategory.query.filter(ServiceCategory.name == data['name'], ServiceCategory.id != data['id']).first()
+        if has_in:
+            raise APIForbidden("该分类已存在，请换一个试试~~")
+
+        if data['id'] > 0:
+            category = ServiceCategory.query.filter_by(id=data['id']).first()
+        else:
+            category = ServiceCategory()
+        category.name = data['name']
+        category.weight = data['weight']
+        self.edit(category)

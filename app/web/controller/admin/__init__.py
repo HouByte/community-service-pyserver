@@ -3,17 +3,14 @@
 # @Author : Vincent Vic
 # @File : __init__.py.py
 # @Software: PyCharm
-from application import app
-from web.controller.admin.OrderController import page_order
-
-from web.controller.admin.StaticController import page_static
-from web.controller.admin.IndexController import page_index
-from web.controller.admin.UserController import page_user
 from web.controller.admin.AccountController import page_account
-from web.controller.admin.MemberController import page_member
 from web.controller.admin.CategoryController import page_category
+from web.controller.admin.IndexController import page_index
+from web.controller.admin.MemberController import page_member
+from web.controller.admin.OrderController import page_order
 from web.controller.admin.ServiceController import page_service
-
+from web.controller.admin.StaticController import page_static
+from web.controller.admin.UserController import page_user
 from web.interceptors.AdminAuthInterceptor import *
 
 # 蓝图管理

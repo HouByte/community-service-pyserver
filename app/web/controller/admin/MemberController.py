@@ -7,8 +7,8 @@ from flask import Blueprint, request
 
 from application import app
 from common.lib.APIException import APIParameterException
-from common.lib.Helper import ops_render, getOpsData, getPageParams
 from common.lib.CommonResult import CommonResult
+from common.lib.Helper import ops_render, getOpsData, getPageParams
 from common.lib.constant import API_UID_KEY_REDIS, API_TOKEN_KEY_REDIS
 from common.lib.redis import Redis
 from web.service.MemberService import MemberService

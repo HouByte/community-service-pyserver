@@ -3,13 +3,10 @@
 # @Author : Vincent Vic
 # @File : UserController.py
 # @Software: PyCharm
-import json
 
-import requests
 from flask import Blueprint, request
-from application import app
+
 from common.lib.CommonResult import CommonResult
-from config.wexin_setting import MINA_APP
 from web.service.MemberService import MemberService
 
 index_api = Blueprint('index_api', __name__)

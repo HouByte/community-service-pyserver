@@ -3,16 +3,12 @@
 # @Author : Vincent Vic
 # @File : CategoryService.py
 # @Software: PyCharm
-import hashlib
-import json
 
-import requests
 from sqlalchemy import or_
 
 from application import db
 from common.lib.APIException import APIParameterException
 from common.lib.Helper import getCurrentDate, Pagination
-from common.lib.CommonResult import CommonResult
 from web.model.ServiceOrder import ServiceOrder
 from web.service.UserService import UserService
 
