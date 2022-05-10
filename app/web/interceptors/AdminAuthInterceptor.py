@@ -7,13 +7,13 @@ import json
 import re
 
 from flask import request, redirect, g
+
 from application import app
 from common.lib.Helper import getCurrentDate
+from common.lib.UrlManager import UrlManager
 from common.lib.constant import ADMIN_TOKEN_KEY_REDIS, ADMIN_LOG_UID_KEY_REDIS
 from common.lib.redis import Redis
-from web.model.User import User
 from web.service.UserService import UserService
-from common.lib.UrlManager import UrlManager
 
 userService = UserService()
 
@@ -53,17 +53,8 @@ def check_login():
     token = cookies[app.config['AUTH_COOKIE_NAME']] if app.config['AUTH_COOKIE_NAME'] in cookies else None
     if token is None:
         return False
-    # auth_info = auth_cookies.split("#")
-    # if len(auth_info) != 2:
-    #     return False
 
     try:
-        # user_info = User.query.filter_by(uid=auth_info[1]).first()
-        # if user_info is None:
-        #     return False
-        # if auth_info[0] != userService.geneAuthCode(user_info):
-        #     return False
-        # return user_info
         info = Redis.read(ADMIN_TOKEN_KEY_REDIS + token)
         if not info:
             return False
