@@ -23,8 +23,12 @@ class CommonResult:
         return jsonify(code=200, msg=msg)
 
     @staticmethod
-    def successData(msg, data):
+    def successDictData(msg, data):
         return jsonify(code=200, msg=msg,data=dict(data))
+
+    @staticmethod
+    def successData(msg, data):
+        return jsonify(code=200, msg=msg,data=data)
 
     @staticmethod
     def fail():

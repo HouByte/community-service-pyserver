@@ -18,6 +18,7 @@ index_api = Blueprint('index_api', __name__)
 '''
 memberService = MemberService()
 
+
 @index_api.post("/login")
 def login():
     req = request.values;
@@ -29,7 +30,7 @@ def login():
     gender = req['gender'] if 'gender' in req else ''
     client_type = req['client_type'] if 'client_type' in req else 'wechat'
     info = memberService.login(code, nickName, avatarUrl, gender, client_type)
-    return CommonResult.successData("登入成功", info)
+    return CommonResult.successDictData("登入成功", info)
 
 
 

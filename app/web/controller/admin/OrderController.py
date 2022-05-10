@@ -36,7 +36,7 @@ def info():
     if not id:
         raise APIParameterException("参数错误")
     info = orderService.getServiceInfo(id)
-    return CommonResult.successData("信息", info)
+    return CommonResult.successDictData("信息", info)
 
 
 @page_order.route("/ops", methods=["POST"])

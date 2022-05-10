@@ -41,7 +41,6 @@ r_db = redis.StrictRedis(redis_host, redis_port, redis_db)
 app.add_template_global(UrlManager.buildStaticUrl, 'buildStaticUrl')
 app.add_template_global(UrlManager.buildUrl, 'buildUrl')
 
-
 @app.errorhandler(Exception)
 def all_page_exception_handler(e):
     path = request.path

@@ -63,8 +63,20 @@ var member_index_ops = {
                     }
 
 
+                    beginDate = "无"
+                    if (data['beginDate']){
+                        date = new Date(data['beginDate'])
+                        beginDate = date.getFullYear() + "-" + date.getMonth() + "-" + date.getDay()
+                    }
 
-                    content = content + "<li><span style='font-size: 18px;margin-right: 5px;'>服务时间:</span> <br/>"+data['beginDate']+" - "+data['endDate']+"</li>\n" +
+                     endDate = "无"
+                    if (data['endDate']){
+                        date = new Date(data['endDate'])
+                        endDate = date.getFullYear() + "-" + date.getMonth() + "-" + date.getDay()
+                    }
+
+
+                    content = content + "<li><span style='font-size: 18px;margin-right: 5px;'>服务时间:</span> <br/>"+beginDate+" ~ "+endDate+"</li>\n" +
                         "<li><span style='font-size: 18px;margin-right: 5px;'>详情:</span><br/>"+data['description']+"</li>\n</ul></div>"
                     common_ops.alert(content);
                 } else {

@@ -87,7 +87,7 @@ def getCurrentDate(format="%Y-%m-%d %H:%M:%S"):
 def getPageParams(req,app):
     return {
         'total': 0,
-        'page_size': app.config['PAGE_SIZE'],
+        'page_size': int(req.get('page_size', app.config['PAGE_SIZE'])),
         'page': int(req.get('page', 1)),
         'display': app.config['PAGE_DISPLAY'],
         'mix_kw': req.get('mix_kw', ''),
