@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # @Time : 2022/4/30 21:33
 # @Author : Vincent Vic
-# @File : AdminAuthInterceptor.py
+# @File : AuthInterceptor.py
 # @Software: PyCharm
 import json
 import re
@@ -9,10 +9,8 @@ import re
 from flask import request, redirect, g
 
 from application import app
-from common.lib.Helper import getCurrentDate
+from common.lib.AuthHelper import get_member_login_id, check_login, log
 from common.lib.UrlManager import UrlManager
-from common.lib.constant import ADMIN_TOKEN_KEY_REDIS, ADMIN_LOG_UID_KEY_REDIS
-from common.lib.redis import Redis
 from web.service.UserService import UserService
 
 userService = UserService()
@@ -31,7 +29,6 @@ def before_request():
     if "/api" in path:
         return
 
-
     user_info = check_login()
 
     g.current_user = None
@@ -48,30 +45,12 @@ def before_request():
     return
 
 
-def check_login():
-    cookies = request.cookies
-    token = cookies[app.config['AUTH_COOKIE_NAME']] if app.config['AUTH_COOKIE_NAME'] in cookies else None
-    if token is None:
-        return False
-
-    try:
-        info = Redis.read(ADMIN_TOKEN_KEY_REDIS + token)
-        if not info:
-            return False
-
-        return json.loads(info)
-    except Exception:
-        return False
+@app.before_request
+def api_before():
+    path = request.path
+    if "/api" not in path:
+        return
+    id = get_member_login_id()
 
 
-def log(uid, url, args):
-    currentDate = getCurrentDate()
-    log = {
-        'created_time': currentDate,
-        'target_url': url,
-        'args': args
-    }
-    Redis.hset(ADMIN_LOG_UID_KEY_REDIS+str(uid), currentDate, json.dumps(log))
-    # 日志记录七天
-    Redis.expire(ADMIN_LOG_UID_KEY_REDIS+str(uid), 60*60*24*7)
-
+    return
