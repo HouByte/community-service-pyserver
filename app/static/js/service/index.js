@@ -11,11 +11,14 @@ var member_index_ops = {
         $(".remove").click(function () {
             that.ops("remove", $(this).attr("data"));
         });
-        $(".lock").click(function () {
-            that.ops("lock", $(this).attr("data"));
+        $(".offShelves").click(function () {
+            that.ops("off_shelves", $(this).attr("data"));
         });
-        $(".recover").click(function () {
-            that.ops("recover", $(this).attr("data"));
+        $(".approval").click(function () {
+            that.ops("approval", $(this).attr("data"));
+        });
+        $(".refuse").click(function () {
+            that.ops("refuse", $(this).attr("data"));
         });
         $(".eye").click(function () {
             that.show($(this).attr("data"));
@@ -120,8 +123,14 @@ var member_index_ops = {
             case 'recover':
                 tip = '确定恢复？'
                 break
-            case 'lock':
-                tip = '确定冻结？'
+            case 'off_shelves':
+                tip = '确定下架该服务？'
+                break
+            case 'approval':
+                tip = '确定发布通过？'
+                break
+            case 'refuse':
+                tip = '确定拒绝发布？'
                 break
         }
         common_ops.confirm(tip, callback);

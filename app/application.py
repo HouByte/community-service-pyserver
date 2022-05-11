@@ -55,7 +55,7 @@ def all_page_exception_handler(e):
         if path.startswith("/api"):
             return jsonify(code=e.code,msg="请求异常请稍后再试"), e.code
         return ops_render('error/error.html'), e.code
-    print(request.path)
+    print(e)
     if path.startswith("/api"):
         return jsonify(code=e.code, msg="服务器异常请稍后再试"), 500
     return ops_render('error/error.html'), 500  # 一般异常

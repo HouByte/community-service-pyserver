@@ -10,10 +10,12 @@ import math
 from flask import render_template, g
 
 
+
 def serialize(model):
     from sqlalchemy.orm import class_mapper
     columns = [c.key for c in class_mapper(model.__class__).columns]
     return dict((c, getattr(model, c)) for c in columns)
+
 
 '''
 自定义分页类
@@ -84,7 +86,8 @@ def ops_render(template, context={}):
 def getCurrentDate(format="%Y-%m-%d %H:%M:%S"):
     return datetime.datetime.now().strftime(format)
 
-def getPageParams(req,app):
+
+def getPageParams(req, app):
     return {
         'total': 0,
         'page_size': int(req.get('page_size', app.config['PAGE_SIZE'])),
@@ -97,6 +100,7 @@ def getPageParams(req,app):
         'category_id': req.get('category_id', -1)
     }
 
+
 def getOpsData(req):
     act = req['act'] if 'act' in req else None
     id = req['id'] if 'id' in req else None
@@ -104,3 +108,6 @@ def getOpsData(req):
         'act': act,
         'id': id
     }
+
+
+

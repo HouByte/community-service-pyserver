@@ -11,7 +11,7 @@ from web.controller.admin.OrderController import page_order
 from web.controller.admin.ServiceController import page_service
 from web.controller.admin.StaticController import page_static
 from web.controller.admin.UserController import page_user
-from web.interceptors.AdminAuthInterceptor import *
+from web.interceptors.AuthInterceptor import *
 
 # 蓝图管理
 app.register_blueprint(page_static, url_prefix="/static")

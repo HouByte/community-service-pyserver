@@ -9,7 +9,7 @@ class Service(db.Model):
 
     id = db.Column(db.Integer, primary_key=True, info='id')
     status = db.Column(db.Integer, nullable=False, info='状态')
-    type = db.Column(db.Integer, nullable=False, info='类型：0 找/ 1提供')
+    type = db.Column(db.Integer, nullable=False, info='类型：1 找/ 2提供')
     nature = db.Column(db.Integer, nullable=False, info='性质：0 互助，1 服务，2 公益')
     title = db.Column(db.String(100), nullable=False, info='标题')
     description = db.Column(db.String, info='详情')

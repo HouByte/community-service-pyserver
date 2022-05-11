@@ -10,3 +10,16 @@ ADMIN_LOG_UID_KEY_REDIS = 'ADMIN_LOG_UID_KEY_REDIS_'
 
 API_TOKEN_KEY_REDIS = 'API_TOKEN_KEY_REDIS_'
 API_UID_KEY_REDIS = 'API_UID_KEY_REDIS_'
+
+
+class serviceStatus():
+    # 待发布
+    UNPUBLISHED = 0
+    # 待审核
+    PENDING = 1
+    # 已发布
+    PUBLISHED = 2
+    # 已下架
+    OFF_SHELVES = 3
+    # 审核不通过
+    DENY = 4

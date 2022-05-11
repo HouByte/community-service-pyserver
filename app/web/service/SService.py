@@ -9,17 +9,15 @@ from sqlalchemy import or_
 from application import db
 from common.lib.APIException import APIParameterException
 from common.lib.Helper import getCurrentDate, Pagination
+from common.lib.constant import serviceStatus
 from web.model.Service import Service
 from web.service.UserService import UserService
 
 userService = UserService()
 
+
 class SService:
     __instance = None
-
-    omb_types = {
-        'wechat_mini': 1
-    }
 
     def __new__(cls, *args, **kwargs):
         if not cls.__instance:
@@ -54,9 +52,16 @@ class SService:
         if mix_kw != '':
             rule = or_(Service.title.ilike("%{0}%".format(mix_kw)), Service.description.ilike("%{0}%".format(mix_kw)))
             query = query.filter(rule)
-        # 状态查询
-        if int(page_params["status"]) > -1:
-            query = query.filter(Service.status == int(page_params["status"]))        # 状态查询
+        # 状态查询,状态大于-1 且 不是公开api可以查询 (后台)
+        if int(page_params["status"]) > -1 and not page_params['api']:
+            query = query.filter(Service.status == int(page_params["status"]))  # 状态查询
+        # 状态查询,状态大于-1 且 会员id存在 （小程序查询自己的服务）
+        elif int(page_params["status"]) > -1 and int(page_params["p_uid"]) > 0:
+            query = query.filter(Service.status == int(page_params["status"]))  # 状态查询
+            query = query.filter(Service.p_uid == int(page_params["p_uid"]))
+        else:
+            query = query.filter(Service.status == serviceStatus.PUBLISHED)  # 公开状态查询
+
         if int(page_params["nature"]) > -1:
             query = query.filter(Service.nature == int(page_params["nature"]))
         if int(page_params["type"]) > -1:
@@ -79,10 +84,12 @@ class SService:
             raise APIParameterException("服务不存在")
         if act == 'remove':
             self.remove(sid)
-        elif act == 'lock':
-            self.updateStatus(sid, 0)
-        elif act == 'recover':
-            self.updateStatus(sid, 1)
+        elif act == 'off_shelves':
+            self.updateStatus(sid, serviceStatus.OFF_SHELVES)
+        elif act == 'approval':
+            self.updateStatus(sid, serviceStatus.PUBLISHED)
+        elif act == 'refuse':
+            self.updateStatus(sid, serviceStatus.DENY)
         db.session.commit()
 
     def updateStatus(self, sid, status):
@@ -96,3 +103,31 @@ class SService:
         service.updated = getCurrentDate()
         db.session.add(service)
         db.session.commit()
+
+    def statusData(self, mid, type):
+
+        data = {
+            'unpublished': 0,
+            'pending': 0,
+            'published': 0,
+            'all': 0
+        }
+
+        if not mid:
+            return data
+        query = Service.query
+        if int(type) >= 0:
+            query = query.filter(Service.type == type)
+        list = query.filter(Service.p_uid == mid).all()
+        data['all'] = len(list)
+        for item in list:
+            # 未发布和被拒绝，取消都算
+            if item.status == serviceStatus.UNPUBLISHED or item.status == serviceStatus.DENY or \
+                    item.status == serviceStatus.OFF_SHELVES:
+                data['unpublished'] = data['unpublished'] + 1
+            elif item.status == serviceStatus.PUBLISHED:
+                data['published'] = data['published'] + 1
+            elif item.status == serviceStatus.PENDING:
+                data['pending'] = data['pending'] + 1
+
+        return data

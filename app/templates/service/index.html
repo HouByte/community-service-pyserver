@@ -18,7 +18,8 @@
                         <select name="category_id" class="form-control inline">
                             <option value="-1">请选择分类</option>
                             {% for category in categorys %}
-                                <option value="{{ category['id'] }}" {% if (category['id'] | string) == search_con.category_id %}
+                                <option value="{{ category['id'] }}"
+                                        {% if (category['id'] | string) == search_con.category_id %}
                                         selected {% endif %}>
                                     {{ category['name'] }}
                                 </option>
@@ -81,7 +82,7 @@
                             <td>{{ categoryMap[item.category] }}</td>
                             <td>
                                 <span>{{ item.title }}</span> |
-                                {% if item.type == 0 %}
+                                {% if item.type == 2 %}
                                     <span class="layui-badge layui-bg-orange">在找</span>
                                 {% elif item.type == 1 %}
                                     <span class="layui-badge layui-bg-blue">提供</span>
@@ -99,29 +100,43 @@
                                 {% endif %}
                             </td>
                             <td>
-                                {% if item.status == 1 %}
-                                    <span class="layui-badge layui-bg-blue">正常</span>
-                                {% else %}
-                                    <span class="layui-badge layui-bg-red">冻结</span>
+                                {% if item.status == 0 %}
+                                    <span class="layui-badge layui-bg-green">待发布</span>
+                                {% elif item.status == 1 %}
+                                    <span class="layui-badge layui-bg-orange">待审核</span>
+                                {% elif item.status == 2 %}
+                                    <span class="layui-badge layui-bg-blue">已发布</span>
+                                {% elif item.status == 3 %}
+                                    <span class="layui-badge layui-bg-xx">已下架</span>
+                                {% elif item.status == 4 %}
+                                    <span class="layui-badge layui-bg-blue">已取消</span>
+                                {% elif item.status == 5 %}
+                                    <span class="layui-badge layui-bg-red">审核被拒</span>
                                 {% endif %}
                             </td>
                             <td>
                                 <a class="m-l eye" href="javascript:void(0);" data="{{ item.id }}" title="更多信息">
                                     <i class="fa fa-eye fa-lg"></i>
                                 </a>
+
+                                {# 用户发布后转 1 ， 管理员才可以审核#}
                                 {% if item.status == 1 %}
-                                    <a class="m-l lock" href="javascript:void(0);" data="{{ item.id }}" title="冻结">
-                                        <i class="fa fa-lock fa-lg"></i>
+                                    <a class="m-l approval" href="javascript:void(0);" data="{{ item.id }}" title="审核通过">
+                                        <i class="fa fa-check-circle fa-lg"></i>
+                                    </a>
+                                    <a class="m-l refuse" href="javascript:void(0);" data="{{ item.id }}" title="审核拒绝">
+                                        <i class="fa fa-times-circle fa-lg"></i>
                                     </a>
 
-                                    <a class="m-l remove" href="javascript:void(0);" data="{{ item.id }}" title="删除">
-                                        <i class="fa fa-trash fa-lg"></i>
-                                    </a>
-                                {% else %}
-                                    <a class="m-l recover" href="javascript:void(0);" data="{{ item.id }}" title="恢复">
-                                        <i class="fa fa-rotate-left fa-lg"></i>
+                                    {#  管理员审核后流转到2，可以冻结#}
+                                {% elif item.status == 2 %}
+                                    <a class="m-l offShelves" href="javascript:void(0);" data="{{ item.id }}" title="下架">
+                                        <i class="fa fa-stop fa-lg"></i>
                                     </a>
                                 {% endif %}
+                                <a class="m-l remove" href="javascript:void(0);" data="{{ item.id }}" title="删除">
+                                    <i class="fa fa-trash fa-lg"></i>
+                                </a>
                             </td>
                         </tr>
                     {% endfor %}

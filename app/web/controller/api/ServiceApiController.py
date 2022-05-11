@@ -6,7 +6,8 @@
 from flask import Blueprint, request
 
 from application import app
-from common.lib.APIException import APIParameterException
+from common.lib.APIException import APIParameterException, APIAuthFailed
+from common.lib.AuthHelper import get_member_login_id
 from common.lib.CommonResult import CommonResult
 from common.lib.Helper import getPageParams
 from web.service.CategoryService import CategoryService
@@ -23,6 +24,13 @@ memberService = MemberService()
 def list():
     req = request.args
     page_params = getPageParams(req, app)
+    # 校验权限 存在状态查询需要登入
+    if page_params["status"] != '' and int(page_params["status"]) >= 0:
+        p_uid = get_member_login_id()
+        if not p_uid:
+            raise APIAuthFailed
+        page_params['p_uid'] = p_uid
+    page_params['api'] = True
     resp_data = sService.getServiceList(page_params)
     pages = resp_data['pages']
     resp_data['pages'] = {
@@ -67,4 +75,12 @@ def getInfo():
         'avatarUrl': member.avatar,
         'nickname': member.nickname
     }
+    return CommonResult.successDictData("desc", resp_data)
+
+@service_api.route("/status/my")
+def getStatus():
+    mid =  get_member_login_id()
+    req = request.args
+    type = req.get('type',-1)
+    resp_data = sService.statusData(mid, type)
     return CommonResult.successDictData("desc", resp_data)
