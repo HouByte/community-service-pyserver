@@ -46,20 +46,28 @@ class SService:
         query = Service.query
         # 分页处理
         page_params['total'] = query.count()
-        pages = Pagination(page_params)
+
         mix_kw = page_params['mix_kw']
         # 昵称或手机号码查询
         if mix_kw != '':
             rule = or_(Service.title.ilike("%{0}%".format(mix_kw)), Service.description.ilike("%{0}%".format(mix_kw)))
             query = query.filter(rule)
+        p_uid = int(page_params["p_uid"]) if 'p_uid' in page_params else -1
+        openApi = True if 'api' in page_params else False
+        print(p_uid)
+
         # 状态查询,状态大于-1 且 不是公开api可以查询 (后台)
-        if int(page_params["status"]) > -1 and not page_params['api']:
+        if int(page_params["status"]) > -1 and not openApi:
+            page_params['total'] = query.filter(Service.status == int(page_params["status"])).count()
             query = query.filter(Service.status == int(page_params["status"]))  # 状态查询
-        # 状态查询,状态大于-1 且 会员id存在 （小程序查询自己的服务）
-        elif int(page_params["status"]) > -1 and int(page_params["p_uid"]) > 0:
+        # 状态查询,小程序查询 状态大于-1 且 会员id存在 （小程序查询自己的服务）
+        elif openApi and int(page_params["status"]) > -1 and p_uid > 0:
+            page_params['total'] = query.filter(Service.status == int(page_params["status"])).count()
             query = query.filter(Service.status == int(page_params["status"]))  # 状态查询
-            query = query.filter(Service.p_uid == int(page_params["p_uid"]))
-        else:
+            query = query.filter(Service.p_uid == p_uid)
+        # 小程序查询
+        elif openApi:
+            page_params['total'] = query.filter(Service.status == serviceStatus.PUBLISHED).count()
             query = query.filter(Service.status == serviceStatus.PUBLISHED)  # 公开状态查询
 
         if int(page_params["nature"]) > -1:
@@ -69,6 +77,7 @@ class SService:
         if int(page_params["category_id"]) > -1:
             query = query.filter(Service.category == int(page_params["category_id"]))
 
+        pages = Pagination(page_params)
         serviceList = query.order_by(Service.id.asc()).all()[pages.getOffset():pages.getLimit()]
         resp_data = {
             'list': serviceList,

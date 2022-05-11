@@ -27,6 +27,7 @@ def index():
     resp_data['categorys'] = categoryService.selectOptions()
     resp_data['categoryMap'] = categoryService.idMaps()
     resp_data["search_con"] = req
+    print(resp_data)
     return ops_render('service/index.html', resp_data)
 
 
