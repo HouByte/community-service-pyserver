@@ -14,7 +14,7 @@ class Service(db.Model):
     title = db.Column(db.String(100), nullable=False, info='标题')
     description = db.Column(db.String, info='详情')
     coverImage = db.Column(db.String(255), nullable=False, info='封面')
-    designatedPlace = db.Column(db.String(255), info='指定地点')
+    designatedPlace = db.Column(db.Integer, info='指定地点')
     price = db.Column(db.Numeric(10, 2), nullable=False, info='价格，互助和公益为0')
     p_uid = db.Column(db.Integer, nullable=False, info='发布人id')
     category = db.Column(db.Integer, nullable=False, info='分类')

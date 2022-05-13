@@ -8,6 +8,7 @@ from flask import Flask, jsonify, request
 from flask_sqlalchemy import SQLAlchemy
 import os
 from dotenv import load_dotenv
+from sqlalchemy import create_engine
 from werkzeug.exceptions import HTTPException
 
 from common.lib.APIException import APIException
@@ -30,7 +31,14 @@ env = os.getenv('FLASK_ENV', 'development')
 app.config.from_pyfile('config/%s_setting.py' % env)
 
 # 创建数据操作对象
-db = SQLAlchemy(app)
+db = SQLAlchemy(app, engine_options={
+    'echo': True,
+    'max_overflow': -1,
+    'pool_size': 50,
+    'pool_recycle': 8000,
+    'pool_pre_ping': True
+})
+
 
 redis_host = app.config['REDIS_HOST']
 redis_port = app.config['REDIS_PORT']
@@ -41,23 +49,21 @@ r_db = redis.StrictRedis(redis_host, redis_port, redis_db)
 app.add_template_global(UrlManager.buildStaticUrl, 'buildStaticUrl')
 app.add_template_global(UrlManager.buildUrl, 'buildUrl')
 
+
 @app.errorhandler(Exception)
 def all_page_exception_handler(e):
     path = request.path
 
-
     if isinstance(e, APIException):
         e.code
-        return jsonify(code=e.code,msg=e.msg), e.code   # 这些异常类在 Werkzeug 中定义，均继承 HTTPException 类
+        return jsonify(code=e.code, msg=e.msg), e.code  # 这些异常类在 Werkzeug 中定义，均继承 HTTPException 类
     # 对于 HTTP 异常，返回自带的错误描述和状态码
     # 这些异常类在 Werkzeug 中定义，均继承 HTTPException 类
     if isinstance(e, HTTPException):
         if path.startswith("/api"):
-            return jsonify(code=e.code,msg="请求异常请稍后再试"), e.code
+            return jsonify(code=e.code, msg="请求异常请稍后再试"), e.code
         return ops_render('error/error.html'), e.code
     print(e)
     if path.startswith("/api"):
         return jsonify(code=e.code, msg="服务器异常请稍后再试"), 500
     return ops_render('error/error.html'), 500  # 一般异常
-
-

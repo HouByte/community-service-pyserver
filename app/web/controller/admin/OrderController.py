@@ -20,8 +20,8 @@ categoryService=CategoryService()
 def index():
     req = request.args
     page_params = getPageParams(req, app)
-    resp_data = orderService.getServiceList(page_params)
-    resp_data["status_mapping"] = app.config["STATUS_MAPPING"]
+    resp_data = orderService.getOrderList(page_params)
+    resp_data["status_mapping"] = app.config["ORDER_STATUS_MAPPING"]
     resp_data["nature_mapping"] = app.config["NATURE_MAPPING"]
     resp_data['categorys'] = categoryService.selectOptions()
     resp_data['categoryMap'] = categoryService.idMaps()
@@ -35,7 +35,7 @@ def info():
     id = req['id'] if 'id' in req else None
     if not id:
         raise APIParameterException("参数错误")
-    info = orderService.getServiceInfo(id)
+    info = orderService.getOrderInfo(id)
     return CommonResult.successDictData("信息", info)
 
 

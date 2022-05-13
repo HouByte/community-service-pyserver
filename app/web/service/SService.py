@@ -9,7 +9,7 @@ from sqlalchemy import or_
 from application import db
 from common.lib.APIException import APIParameterException
 from common.lib.Helper import getCurrentDate, Pagination
-from common.lib.constant import serviceStatus
+from common.lib.constant import ServiceStatus
 from web.model.Service import Service
 from web.service.UserService import UserService
 
@@ -54,21 +54,24 @@ class SService:
             query = query.filter(rule)
         p_uid = int(page_params["p_uid"]) if 'p_uid' in page_params else -1
         openApi = True if 'api' in page_params else False
-        print(p_uid)
+        status = int(page_params["status"])
 
         # 状态查询,状态大于-1 且 不是公开api可以查询 (后台)
-        if int(page_params["status"]) > -1 and not openApi:
-            page_params['total'] = query.filter(Service.status == int(page_params["status"])).count()
-            query = query.filter(Service.status == int(page_params["status"]))  # 状态查询
+        if status > -1 and not openApi:
+            page_params['total'] = query.filter(Service.status == status).count()
+            query = query.filter(Service.status == status)  # 状态查询
         # 状态查询,小程序查询 状态大于-1 且 会员id存在 （小程序查询自己的服务）
-        elif openApi and int(page_params["status"]) > -1 and p_uid > 0:
-            page_params['total'] = query.filter(Service.status == int(page_params["status"])).count()
-            query = query.filter(Service.status == int(page_params["status"]))  # 状态查询
+        elif openApi and p_uid > 0 and int(page_params['source']) == 2 :
+            if status > -1:
+                query = query.filter(Service.status == status)  # 状态查询
+                page_params['total'] = query.filter(Service.status == status,Service.p_uid == p_uid).count()
+            else:
+                page_params['total'] = query.filter(Service.p_uid == p_uid).count()
             query = query.filter(Service.p_uid == p_uid)
         # 小程序查询
         elif openApi:
-            page_params['total'] = query.filter(Service.status == serviceStatus.PUBLISHED).count()
-            query = query.filter(Service.status == serviceStatus.PUBLISHED)  # 公开状态查询
+            page_params['total'] = query.filter(Service.status == ServiceStatus.PUBLISHED).count()
+            query = query.filter(Service.status == ServiceStatus.PUBLISHED)  # 公开状态查询
 
         if int(page_params["nature"]) > -1:
             query = query.filter(Service.nature == int(page_params["nature"]))
@@ -78,7 +81,7 @@ class SService:
             query = query.filter(Service.category == int(page_params["category_id"]))
 
         pages = Pagination(page_params)
-        serviceList = query.order_by(Service.id.asc()).all()[pages.getOffset():pages.getLimit()]
+        serviceList = query.order_by(Service.id.desc()).all()[pages.getOffset():pages.getLimit()]
         resp_data = {
             'list': serviceList,
             "pages": pages.getPages(),
@@ -94,11 +97,11 @@ class SService:
         if act == 'remove':
             self.remove(sid)
         elif act == 'off_shelves':
-            self.updateStatus(sid, serviceStatus.OFF_SHELVES)
+            self.updateStatus(sid, ServiceStatus.OFF_SHELVES)
         elif act == 'approval':
-            self.updateStatus(sid, serviceStatus.PUBLISHED)
+            self.updateStatus(sid, ServiceStatus.PUBLISHED)
         elif act == 'refuse':
-            self.updateStatus(sid, serviceStatus.DENY)
+            self.updateStatus(sid, ServiceStatus.DENY)
         db.session.commit()
 
     def updateStatus(self, sid, status):
@@ -110,6 +113,8 @@ class SService:
 
     def edit(self, service):
         service.updated = getCurrentDate()
+        if service.id is None:
+            service.created = getCurrentDate()
         db.session.add(service)
         db.session.commit()
 
@@ -131,12 +136,32 @@ class SService:
         data['all'] = len(list)
         for item in list:
             # 未发布和被拒绝，取消都算
-            if item.status == serviceStatus.UNPUBLISHED or item.status == serviceStatus.DENY or \
-                    item.status == serviceStatus.OFF_SHELVES:
+            if item.status == ServiceStatus.UNPUBLISHED or item.status == ServiceStatus.DENY or \
+                    item.status == ServiceStatus.OFF_SHELVES:
                 data['unpublished'] = data['unpublished'] + 1
-            elif item.status == serviceStatus.PUBLISHED:
+            elif item.status == ServiceStatus.PUBLISHED:
                 data['published'] = data['published'] + 1
-            elif item.status == serviceStatus.PENDING:
+            elif item.status == ServiceStatus.PENDING:
                 data['pending'] = data['pending'] + 1
 
         return data
+
+    def publishService(self, params):
+        service = Service()
+        if 'id' in params:
+            service.id = params['id']
+        service.title = params['title']
+        service.type = params['type']
+        service.nature = params['nature']
+        service.category = params['category']
+        service.price = params['price']
+        service.status = ServiceStatus.PENDING
+        service.beginDate = params['beginDate']
+        service.endDate = params['endDate']
+        service.p_uid = params['p_uid']
+        service.description = params['description']
+        service.coverImage = params['coverImage']
+        service.designatedPlace = params['designatedPlace']
+        service.score = 0
+        service.salesVolume = 0
+        self.edit(service)

@@ -6,7 +6,7 @@
                 <div class="row  m-t p-w-m">
                     <div class="form-group">
                         <select name="status" class="form-control inline">
-                            <option value="-1">请选择状态</option>
+                            <option value="-1">全部状态</option>
                             {% for tem_key in status_mapping %}
                                 <option value="{{ tem_key }}" {% if tem_key== search_con.status %} selected {% endif %}>
                                     {{ status_mapping[tem_key] }}
