@@ -94,6 +94,7 @@ class UserService:
         user_info.updated_time = getCurrentDate()
         db.session.add(user_info)
         db.session.commit()
+        # db.session.close()
 
     def set(self, data):
         has_in = User.query.filter(User.login_name == data['login_name'], User.uid != data['uid']).first()
@@ -129,6 +130,7 @@ class UserService:
         # 数据库修改
         db.session.add(user_info)
         db.session.commit()
+        db.session.close()
 
     def resetPwd(self, user_info, data):
         if user_info.login_pwd != self.genePwd(data['old_password'], user_info.login_salt):
@@ -141,6 +143,7 @@ class UserService:
     def remove(self, uid):
         db.session.query(User).filter(User.uid == uid).delete()
         db.session.commit()
+        db.session.close()
 
     def ops(self, data):
         act = data['act']
@@ -154,11 +157,12 @@ class UserService:
             self.updateStatus(uid, 0)
         elif act == 'recover':
             self.updateStatus(uid, 1)
-        db.session.commit()
         return user_info
 
     def updateStatus(self, uid, status):
         db.session.query(User).filter_by(uid=uid).update({'status': status, 'updated_time': getCurrentDate()})
+        db.session.commit()
+        db.session.close()
 
     def geneAuthCode(self, user_info):
         m = hashlib.md5()

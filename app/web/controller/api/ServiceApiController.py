@@ -128,7 +128,7 @@ def publishService():
         raise APIParameterException("请选择性质")
     if description is None or len(description) < 20:
         raise APIParameterException("请输入符合规范的详情")
-    if coverImage is None or len(coverImage) < 1:
+    if coverImage is None or len(coverImage) < 1 or coverImage == 'null':
         raise APIParameterException("请上传封面")
     if category is None or category < 0:
         raise APIParameterException("请选择分类")

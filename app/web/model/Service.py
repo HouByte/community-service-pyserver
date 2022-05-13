@@ -1,13 +1,11 @@
 # coding: utf-8
-from flask_sqlalchemy import SQLAlchemy
-
-db = SQLAlchemy()
+from application import db
 
 
 class Service(db.Model):
     __tablename__ = 'service'
 
-    id = db.Column(db.Integer, primary_key=True, info='id')
+    id = db.Column(db.Integer, primary_key=True)
     status = db.Column(db.Integer, nullable=False, info='状态')
     type = db.Column(db.Integer, nullable=False, info='类型：1 找/ 2提供')
     nature = db.Column(db.Integer, nullable=False, info='性质：0 互助，1 服务，2 公益')

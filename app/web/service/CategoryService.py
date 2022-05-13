@@ -82,18 +82,21 @@ class CategoryService:
             self.updateStatus(mid, 0)
         elif act == 'recover':
             self.updateStatus(mid, 1)
-        db.session.commit()
 
     def updateStatus(self, mid, status):
         db.session.query(ServiceCategory).filter_by(id=mid).update({'status': status, 'updated_time': getCurrentDate()})
+        db.session.commit()
+        db.session.close()
 
     def remove(self, cid):
         db.session.query(ServiceCategory).filter(ServiceCategory.id == cid).delete()
         db.session.commit()
+        db.session.close()
 
     def edit(self, category):
         db.session.add(category)
         db.session.commit()
+        db.session.close()
 
     def set(self, data):
         has_in = ServiceCategory.query.filter(ServiceCategory.name == data['name'], ServiceCategory.id != data['id']).first()

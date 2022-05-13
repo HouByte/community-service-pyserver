@@ -51,7 +51,6 @@ def edit():
     # redis 更新数据
     info = userService.getInfoJson(user_info)
     token = Redis.read(ADMIN_UID_KEY_REDIS + str(user_info.uid))
-    print(token)
     if not token:
         return redirect(UrlManager.buildUrl('/login'))
     Redis.write(ADMIN_TOKEN_KEY_REDIS + token, json.dumps(info))

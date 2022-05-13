@@ -62,7 +62,12 @@ class SService:
             query = query.filter(Service.status == status)  # 状态查询
         # 状态查询,小程序查询 状态大于-1 且 会员id存在 （小程序查询自己的服务）
         elif openApi and p_uid > 0 and int(page_params['source']) == 2 :
-            if status > -1:
+
+            if status == 0:
+                rule = or_(Service.status == 0, Service.status == 3, Service.status == 4)
+                query = query.filter(rule)  # 状态查询
+                page_params['total'] = query.filter(rule).count()
+            elif status > -1:
                 query = query.filter(Service.status == status)  # 状态查询
                 page_params['total'] = query.filter(Service.status == status,Service.p_uid == p_uid).count()
             else:
@@ -102,21 +107,40 @@ class SService:
             self.updateStatus(sid, ServiceStatus.PUBLISHED)
         elif act == 'refuse':
             self.updateStatus(sid, ServiceStatus.DENY)
-        db.session.commit()
 
     def updateStatus(self, sid, status):
         db.session.query(Service).filter_by(id=sid).update({'status': status, 'updated': getCurrentDate()})
+        db.session.commit()
+        db.session.close()
 
     def remove(self, sid):
         db.session.query(Service).filter(Service.id == sid).delete()
         db.session.commit()
+        db.session.close()
 
     def edit(self, service):
         service.updated = getCurrentDate()
         if service.id is None:
             service.created = getCurrentDate()
-        db.session.add(service)
+            db.session.add(service)
+        else:
+            db.session.query(Service).filter_by(id=service.id).update(
+                {
+                    'status': ServiceStatus.PENDING,
+                    'type': service.type,
+                    'nature': service.nature,
+                    'title': service.title,
+                    'description': service.description,
+                    'coverImage': service.coverImage,
+                    'designatedPlace': service.designatedPlace,
+                    'price': service.price,
+                    'category': service.category,
+                    'beginDate': service.beginDate,
+                    'endDate': service.endDate,
+                    'updated': getCurrentDate()})
+
         db.session.commit()
+        db.session.close()
 
     def statusData(self, mid, type):
 

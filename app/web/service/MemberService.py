@@ -73,6 +73,8 @@ class MemberService:
             omb.created_time = getCurrentDate()
             omb.updated_time = getCurrentDate()
             db.session.add(omb)
+            db.session.commit()
+            db.session.close()
 
         else:
             member = self.getMember(omb.member_id)
@@ -85,6 +87,7 @@ class MemberService:
             db.session.add(member)
 
         db.session.commit()
+        db.session.close()
 
         token = hashlib.md5(session_key.encode(encoding='UTF-8')).hexdigest()
         info = {
@@ -129,17 +132,21 @@ class MemberService:
             self.updateStatus(mid, 0)
         elif act == 'recover':
             self.updateStatus(mid, 1)
-        db.session.commit()
+
         return member.id
 
     def updateStatus(self, mid, status):
         db.session.query(Member).filter_by(id=mid).update({'status': status, 'updated_time': getCurrentDate()})
+        db.session.commit()
+        db.session.close()
 
 
     def remove(self, mid):
         db.session.query(Member).filter(Member.id == mid).delete()
         db.session.commit()
+        db.session.close()
 
     def edit(self, member):
         db.session.add(member)
         db.session.commit()
+        db.session.close()

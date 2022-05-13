@@ -118,18 +118,22 @@ class OrderService:
         elif act == 'recover':
             self.updateStatus(sid, 1)
         db.session.commit()
+        db.session.close()
 
     def updateStatus(self, sid, status):
         db.session.query(ServiceOrder).filter_by(id=sid).update({'status': status, 'updated': getCurrentDate()})
+        db.session.close()
 
     def remove(self, sid):
         db.session.query(ServiceOrder).filter(ServiceOrder.id == sid).delete()
         db.session.commit()
+        db.session.close()
 
     def edit(self, serviceOrder):
         serviceOrder.updated = getCurrentDate()
         db.session.add(serviceOrder)
         db.session.commit()
+        db.session.close()
 
     def statusData(self, mid, role):
 
@@ -164,8 +168,6 @@ class OrderService:
     def createOrder(self,service,address):
         order = ServiceOrder()
         now = datetime.datetime.now()
-        print(now)
-        print(now.strftime("%d%H%M%S"))
         order.orderNo = now.strftime("%d%H%M%S") + str(int(time.time()))
         order.status = OrderStatus.UNAPPROVED
         order.p_uid = service.p_uid

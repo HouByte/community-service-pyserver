@@ -98,5 +98,5 @@ def createOrder():
         # "postalCode":"510000","provinceName":"广东省","cityName":"广州市","countyName":"海珠区","detailInfo":"x"}
         if not address or len(address) < 190:
             raise APIParameterException("需要地址信息")
-    orderService.createOrder(service,address)
+    orderService.createOrder(service, address)
     return CommonResult.success()
