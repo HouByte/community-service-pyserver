@@ -135,8 +135,6 @@ def set():
 @page_account.route("/ops", methods=["POST"])
 def ops():
     data = getOpsData(request.values)
-    if not data['act'] or not data['id']:
-        raise APIParameterException("参数错误")
     if int(data['id']) == 1:
         raise APIParameterException("超级管理员不允许被操作")
     if g.current_user['login_name'] != 'root':

@@ -3,12 +3,13 @@
 # @Author : Vincent Vic
 # @File : CategoryService.py
 # @Software: PyCharm
+import datetime
 
 from sqlalchemy import or_
 
 from application import db
 from common.lib.APIException import APIParameterException
-from common.lib.Helper import getCurrentDate, Pagination
+from common.lib.Helper import getCurrentDate, Pagination, getDateByAgo
 from common.lib.constant import ServiceStatus
 from web.model.Service import Service
 from web.service.UserService import UserService
@@ -105,6 +106,8 @@ class SService:
             self.updateStatus(sid, ServiceStatus.OFF_SHELVES)
         elif act == 'approval':
             self.updateStatus(sid, ServiceStatus.PUBLISHED)
+        elif act == 'pending':
+            self.updateStatus(sid, ServiceStatus.PENDING)
         elif act == 'refuse':
             self.updateStatus(sid, ServiceStatus.DENY)
 
@@ -189,3 +192,42 @@ class SService:
         service.score = 0
         service.salesVolume = 0
         self.edit(service)
+
+    def getVolume(self,day=30):
+        q_date = getDateByAgo(day)
+        list = Service.query.filter(Service.created >= q_date).all()
+        resp_data = {
+            'today-service-volume': 0,
+            '30-service-volume': len(list),
+            'pending-review-volume': 0,
+        }
+        for item in list:
+            if item.status == ServiceStatus.PENDING:
+                resp_data['pending-review-volume'] = resp_data['pending-review-volume'] + 1
+            if item.created == datetime.datetime.today().date():
+                resp_data['today-service-volume'] = resp_data['today-service-volume'] + 1
+
+        return resp_data
+
+    def getNatureData(self):
+        list = Service.query.filter(Service.status == ServiceStatus.PUBLISHED).all()
+        resp_data = [
+            {'value': 0, 'name': '互助'},
+            {'value': 0, 'name': '服务'},
+            {'value': 0, 'name': '公益'},
+        ]
+        for item in list:
+            resp_data[item.nature]['value'] = resp_data[item.nature]['value'] + 1
+
+        return resp_data
+
+    def getTypeData(self):
+        list = Service.query.filter(Service.status == ServiceStatus.PUBLISHED).all()
+        resp_data = [
+            {'value': 0, 'name': '提供'},
+            {'value': 0, 'name': '寻找'},
+        ]
+        for item in list:
+            resp_data[item.type - 1]['value'] = resp_data[item.type - 1]['value'] + 1
+
+        return resp_data

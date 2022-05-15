@@ -14,16 +14,29 @@ from common.lib.Helper import ops_render
 from common.lib.UrlManager import UrlManager
 from common.lib.constant import ADMIN_TOKEN_KEY_REDIS, ADMIN_UID_KEY_REDIS
 from common.lib.redis import Redis
+from web.service.MemberService import MemberService
+from web.service.OrderService import OrderService
+from web.service.SService import SService
 from web.service.UserService import UserService
 
 page_index = Blueprint('index_page', __name__)
 
 userService = UserService()
+orderService = OrderService()
+sService = SService()
+memberService = MemberService()
 
 
 @page_index.route("/")
 def index():
-    return ops_render('index/index.html')
+    orderService.getVolume()
+    resp_data = {
+
+        'order': orderService.getVolume(),
+        'service': sService.getVolume(),
+        'member': memberService.getVolume()
+    }
+    return ops_render('index/index.html', resp_data)
 
 
 @page_index.route("/login", methods=["GET", "POST"])
@@ -45,8 +58,8 @@ def login():
     # token 记录
     token = str(uuid.uuid4())
     info = userService.getInfoJson(user_info)
-    Redis.write(ADMIN_TOKEN_KEY_REDIS+token, json.dumps(info))
-    Redis.write(ADMIN_UID_KEY_REDIS+str(user_info.uid), token)
+    Redis.write(ADMIN_TOKEN_KEY_REDIS + token, json.dumps(info))
+    Redis.write(ADMIN_UID_KEY_REDIS + str(user_info.uid), token)
     # cookie 存储token 1天
     cookieResponse.set_cookie(app.config['AUTH_COOKIE_NAME'], token, 60 * 60 * 24 * 1)
 

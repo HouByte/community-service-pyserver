@@ -6,9 +6,11 @@
 # 统一渲染方法
 import datetime
 import math
+import time
 
 from flask import render_template, g
 
+from common.lib.APIException import APIParameterException
 
 
 def serialize(model):
@@ -104,10 +106,18 @@ def getPageParams(req, app):
 def getOpsData(req):
     act = req['act'] if 'act' in req else None
     id = req['id'] if 'id' in req else None
+    if not act or not id:
+        raise APIParameterException("参数错误")
     return {
         'act': act,
         'id': id
     }
+
+def getDateByAgo(day):
+    # 先获得时间数组格式的日期
+    dayAgo = (datetime.datetime.now() - datetime.timedelta(days=day))
+    # 转换为其他字符串格式
+    return dayAgo.strftime("%Y-%m-%d %H:%M:%S")
 
 
 

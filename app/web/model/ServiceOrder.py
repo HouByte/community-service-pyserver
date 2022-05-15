@@ -10,6 +10,7 @@ class ServiceOrder(db.Model):
     status = db.Column(db.Integer, nullable=False, info='状态')
     p_uid = db.Column(db.Integer, nullable=False, info='提供者id')
     c_uid = db.Column(db.Integer, nullable=False, info='客户id')
+    sid = db.Column(db.Integer, nullable=False, info='服务id')
     snap_title = db.Column(db.String(100), nullable=False, info='服务名称镜像')
     snap_nature = db.Column(db.Integer, nullable=False, info='性质：0 互助，1 服务，2 公益')
     snap_cover_image = db.Column(db.String(255), nullable=False, info='服务封面镜像')

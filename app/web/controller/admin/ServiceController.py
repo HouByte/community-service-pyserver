@@ -44,7 +44,5 @@ def info():
 @page_service.route("/ops", methods=["POST"])
 def ops():
     data = getOpsData(request.values)
-    if not data['act'] or not data['id']:
-        raise APIParameterException("参数错误")
     sService.ops(data)
     return CommonResult.successMsg("更新成功")

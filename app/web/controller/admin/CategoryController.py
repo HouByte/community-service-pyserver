@@ -28,8 +28,6 @@ def index():
 @page_category.route("/ops", methods=["POST"])
 def ops():
     data = getOpsData(request.values)
-    if not data['act'] or not data['id']:
-        raise APIParameterException("参数错误")
     categoryService.ops(data)
     return CommonResult.successMsg("更新成功")
 

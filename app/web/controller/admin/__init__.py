@@ -5,6 +5,7 @@
 # @Software: PyCharm
 from web.controller.admin.AccountController import page_account
 from web.controller.admin.CategoryController import page_category
+from web.controller.admin.ChartsController import page_charts
 from web.controller.admin.IndexController import page_index
 from web.controller.admin.MemberController import page_member
 from web.controller.admin.OrderController import page_order
@@ -22,3 +23,4 @@ app.register_blueprint(page_member, url_prefix="/member")
 app.register_blueprint(page_category, url_prefix="/category")
 app.register_blueprint(page_service, url_prefix="/service")
 app.register_blueprint(page_order, url_prefix="/order")
+app.register_blueprint(page_charts, url_prefix="/charts")

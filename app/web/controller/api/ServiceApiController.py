@@ -9,7 +9,7 @@ from application import app
 from common.lib.APIException import APIParameterException, APIAuthFailed
 from common.lib.AuthHelper import get_member_login_id
 from common.lib.CommonResult import CommonResult
-from common.lib.Helper import getPageParams
+from common.lib.Helper import getPageParams, getOpsData
 from web.model.Service import Service
 from web.service.CategoryService import CategoryService
 from web.service.MemberService import MemberService
@@ -20,6 +20,8 @@ service_api = Blueprint('service_api', __name__)
 sService = SService()
 categoryService = CategoryService()
 memberService = MemberService()
+
+ops_power = ['off_shelves']
 
 
 @service_api.get("/list")
@@ -153,3 +155,20 @@ def publishService():
         params['id'] = id
     sService.publishService(params)
     return CommonResult.successMsg("提交成功")
+
+
+@service_api.post("/ops")
+def ops():
+    p_uid = get_member_login_id()
+    if not p_uid:
+        raise APIAuthFailed
+    data = getOpsData(request.values)
+
+    # 校验是否是自己的服务且操作是否有权限
+    if data['act'] not in ops_power:
+        raise APIParameterException("没有该操作")
+    p_service = sService.getService(int(data['id']))
+    if p_uid != p_service.p_uid:
+        raise APIParameterException("系统异常")
+    sService.ops(data)
+    return CommonResult.successMsg("更新成功")

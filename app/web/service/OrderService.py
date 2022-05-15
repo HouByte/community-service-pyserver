@@ -11,7 +11,7 @@ from sqlalchemy import or_
 
 from application import db
 from common.lib.APIException import APIParameterException
-from common.lib.Helper import getCurrentDate, Pagination
+from common.lib.Helper import getCurrentDate, Pagination, getDateByAgo
 from common.lib.constant import OrderStatus
 from web.model.ServiceOrder import ServiceOrder
 from web.service.CategoryService import CategoryService
@@ -24,10 +24,6 @@ memberService = MemberService()
 
 class OrderService:
     __instance = None
-
-    omb_types = {
-        'wechat_mini': 1
-    }
 
     def __new__(cls, *args, **kwargs):
         if not cls.__instance:
@@ -62,7 +58,7 @@ class OrderService:
         query = ServiceOrder.query
         # 分页处理
         page_params['total'] = query.count()
-        pages = Pagination(page_params)
+
         mix_kw = page_params['mix_kw']
         # 昵称或手机号码查询
         if mix_kw != '':
@@ -98,6 +94,7 @@ class OrderService:
         if int(page_params["category_id"]) > -1:
             query = query.filter(ServiceOrder.snap_category == int(page_params["category_id"]))
 
+        pages = Pagination(page_params)
         serviceList = query.order_by(ServiceOrder.id.desc()).all()[pages.getOffset():pages.getLimit()]
         resp_data = {
             'list': serviceList,
@@ -114,26 +111,36 @@ class OrderService:
         if act == 'remove':
             self.remove(sid)
         elif act == 'lock':
-            self.updateStatus(sid, 0)
+            status = -1 * serviceOrder.status
+            self.updateStatus(sid, status)
         elif act == 'recover':
-            self.updateStatus(sid, 1)
-        db.session.commit()
-        db.session.close()
+            self.updateStatus(sid, abs(serviceOrder.status))
+        elif act == 'agree':
+            self.updateStatus(sid, OrderStatus.UNPAID)
+        elif act == 'pay':
+            self.updateStatus(sid, OrderStatus.UNCONFIRMED)
+        elif act == 'confirmed':
+            self.updateStatus(sid, OrderStatus.UNRATED)
+        elif act == 'rating':
+            self.updateStatus(sid, OrderStatus.COMPLETED)
+        elif act == 'canceled':
+            self.updateStatus(sid, OrderStatus.CANCELED)
+        elif act == 'deny':
+            self.updateStatus(sid, OrderStatus.REFUSED)
+        return serviceOrder
 
     def updateStatus(self, sid, status):
         db.session.query(ServiceOrder).filter_by(id=sid).update({'status': status, 'updated': getCurrentDate()})
-        db.session.close()
+        db.session.commit()
 
     def remove(self, sid):
         db.session.query(ServiceOrder).filter(ServiceOrder.id == sid).delete()
         db.session.commit()
-        db.session.close()
 
     def edit(self, serviceOrder):
         serviceOrder.updated = getCurrentDate()
         db.session.add(serviceOrder)
         db.session.commit()
-        db.session.close()
 
     def statusData(self, mid, role):
 
@@ -165,7 +172,8 @@ class OrderService:
                 data['unrated'] = data['unrated'] + 1
 
         return data
-    def createOrder(self,service,address):
+
+    def createOrder(self, service, address):
         order = ServiceOrder()
         now = datetime.datetime.now()
         order.orderNo = now.strftime("%d%H%M%S") + str(int(time.time()))
@@ -219,7 +227,6 @@ class OrderService:
                 'nickname': c_member.nickname
             }
 
-
         item['serviceSnap'] = {
             'nature': order.snap_nature,
             'coverImage': {
@@ -232,18 +239,59 @@ class OrderService:
                 'name': categoryMap[order.snap_category]
             }
         }
-
-        item['addressSnap'] = {
-            'cityName': order.consumer_snap_city,
-            'countyName': order.consumer_snap_county,
-            'description': order.consumer_snap_description,
-            'provinceName': order.consumer_snap_province,
-            'telNumber': order.consumer_snap_tel,
-            'userName': order.consumer_snap_username
-        }
+        if order.consumer_snap_username:
+            item['addressSnap'] = {
+                'cityName': order.consumer_snap_city,
+                'countyName': order.consumer_snap_county,
+                'description': order.consumer_snap_description,
+                'provinceName': order.consumer_snap_province,
+                'telNumber': order.consumer_snap_tel,
+                'userName': order.consumer_snap_username
+            }
         item['created'] = order.created.strftime('%Y-%m-%d')
         item['id'] = order.id
         item['orderNo'] = order.orderNo
         item['price'] = order.price
         item['status'] = order.status
         return item
+
+    def getVolume(self, day=30):
+        q_date = getDateByAgo(day)
+        list = ServiceOrder.query.filter(ServiceOrder.created >= q_date).all()
+        resp_data = {
+            'today-trading-amount': 0,
+            '30-trading-amount': 0,
+            'today-trading-volume': 0,
+            '30-trading-volume': len(list),
+        }
+        for item in list:
+            print(item.created.date())
+            if OrderStatus.UNPAID < item.status < OrderStatus.CANCELED:
+                resp_data['30-trading-amount'] = resp_data['30-trading-amount'] + item.price
+                if item.created == datetime.datetime.today().date():
+                    resp_data['today-trading-amount'] = resp_data['today-trading-amount'] + item.price
+            if item.created == datetime.datetime.today().date():
+                resp_data['today-trading-volume'] = resp_data['today-trading-volume'] + 1
+        return resp_data
+
+    def getTradingData(self, day=7):
+        q_date = getDateByAgo(day)
+        list = ServiceOrder.query.filter(ServiceOrder.created >= q_date).all()
+        resp_data = dict()
+        for item in list:
+            key = item.created.strftime('%Y-%m-%d')
+            if key in resp_data:
+                resp_data[key] = resp_data[key] + 1
+            else:
+                resp_data[key] = 1
+
+        return resp_data
+
+    def getTradingStatusData(self, day=30):
+        q_date = getDateByAgo(day)
+        list = ServiceOrder.query.filter(ServiceOrder.created >= q_date).all()
+        resp_data = [0, 0, 0, 0, 0, 0, 0]
+        for item in list:
+            resp_data[item.status] = resp_data[item.status] + 1
+
+        return resp_data

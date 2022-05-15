@@ -9,7 +9,7 @@ from application import app
 from common.lib.APIException import APIParameterException, APIAuthFailed, APINotFound
 from common.lib.AuthHelper import get_member_login_id
 from common.lib.CommonResult import CommonResult
-from common.lib.Helper import getPageParams
+from common.lib.Helper import getPageParams, getOpsData
 from web.service.CategoryService import CategoryService
 from web.service.MemberService import MemberService
 from web.service.OrderService import OrderService
@@ -21,6 +21,8 @@ sService = SService()
 orderService = OrderService()
 categoryService = CategoryService()
 memberService = MemberService()
+
+ops_power = ['agree', 'pay', 'confirmed', 'canceled', 'deny']
 
 
 @order_api.route("/list")
@@ -100,3 +102,22 @@ def createOrder():
             raise APIParameterException("需要地址信息")
     orderService.createOrder(service, address)
     return CommonResult.success()
+
+@order_api.post("/ops")
+def ops():
+    a_uid = get_member_login_id()
+    if not a_uid:
+        raise APIAuthFailed
+    data = getOpsData(request.values)
+    # 校验是否是自己的服务且操作是否有权限
+    if data['act'] not in ops_power:
+        raise APIParameterException("没有该操作")
+    order = orderService.getOrder(int(data['id']))
+    print(a_uid!=order.p_uid)
+    if data['act'] == 'agree' and a_uid != order.p_uid:
+        raise APIParameterException("你不是服务所有人")
+    elif data['act'] != 'agree' and a_uid != order.c_uid:
+        raise APIParameterException("你不是订单所有人")
+
+    orderService.ops(data)
+    return CommonResult.successMsg("更新成功")

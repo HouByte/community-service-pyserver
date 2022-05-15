@@ -3,6 +3,7 @@
 # @Author : Vincent Vic
 # @File : MemberService.py
 # @Software: PyCharm
+import datetime
 import hashlib
 import json
 
@@ -11,7 +12,7 @@ from sqlalchemy import or_
 
 from application import db
 from common.lib.APIException import APIParameterException
-from common.lib.Helper import getCurrentDate, Pagination
+from common.lib.Helper import getCurrentDate, Pagination, getDateByAgo
 from common.lib.constant import API_TOKEN_KEY_REDIS, API_UID_KEY_REDIS
 from common.lib.redis import Redis
 from config.wexin_setting import MINA_APP
@@ -87,7 +88,6 @@ class MemberService:
             db.session.add(member)
 
         db.session.commit()
-        db.session.close()
 
         token = hashlib.md5(session_key.encode(encoding='UTF-8')).hexdigest()
         info = {
@@ -138,15 +138,24 @@ class MemberService:
     def updateStatus(self, mid, status):
         db.session.query(Member).filter_by(id=mid).update({'status': status, 'updated_time': getCurrentDate()})
         db.session.commit()
-        db.session.close()
-
 
     def remove(self, mid):
         db.session.query(Member).filter(Member.id == mid).delete()
         db.session.commit()
-        db.session.close()
 
     def edit(self, member):
         db.session.add(member)
         db.session.commit()
-        db.session.close()
+
+    def getVolume(self, day=30):
+        q_date = getDateByAgo(day)
+        list = Member.query.filter(Member.created_time >= q_date).all()
+        resp_data = {
+            'today-member-volume': 0,
+            '30-member-volume': len(list),
+        }
+        for item in list:
+            if item.created_time == datetime.datetime.today().date():
+                resp_data['today-member-volume'] = resp_data['today-member-volume'] + 1
+
+        return resp_data

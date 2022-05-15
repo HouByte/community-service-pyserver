@@ -28,8 +28,6 @@ def index():
 @page_member.route("/ops", methods=["POST"])
 def ops():
     data = getOpsData(request.values)
-    if not data['act'] or not data['id']:
-        raise APIParameterException("参数错误")
 
     id = memberService.ops(data)
     token = Redis.read(API_UID_KEY_REDIS + str(id))
