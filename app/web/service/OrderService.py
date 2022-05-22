@@ -37,8 +37,8 @@ class OrderService:
     def getOrder(self, id):
         return ServiceOrder.query.filter_by(id=id).first()
 
-    def getOrderInfo(self, sid):
-        serviceOrder = self.getOrder(sid)
+    def getOrderInfo(self, oid):
+        serviceOrder = self.getOrder(oid)
         if not serviceOrder:
             raise APIParameterException("订单不存在")
         info = dict(serviceOrder)
@@ -68,7 +68,7 @@ class OrderService:
                        ServiceOrder.snap_title.ilike("%{0}%".format(mix_kw)))
             query = query.filter(rule)
 
-        p_uid = int(page_params["p_uid"]) if 'p_uid' in page_params else -1
+        uid = int(page_params["uid"]) if 'uid' in page_params else -1
         openApi = True if 'api' in page_params else False
         status = int(page_params["status"])
         # 状态查询,状态大于-1 且 不是公开api可以查询 (后台)
@@ -76,7 +76,7 @@ class OrderService:
             page_params['total'] = query.filter(ServiceOrder.status == status).count()
             query = query.filter(ServiceOrder.status == status)  # 状态查询
         # 状态查询,小程序查询 状态大于-1 且 会员id存在 （小程序查询自己的服务）
-        elif openApi and p_uid > 0:
+        elif openApi and uid > 0:
             if status > -1:
                 page_params['total'] = query.filter(ServiceOrder.status == status).count()
                 query = query.filter(ServiceOrder.status == status)  # 状态查询
@@ -85,9 +85,9 @@ class OrderService:
 
             role = int(page_params['role']) == 1
             if (role):
-                query = query.filter(ServiceOrder.p_uid == p_uid)
+                query = query.filter(ServiceOrder.p_uid == uid)
             else:
-                query = query.filter(ServiceOrder.c_uid == p_uid)
+                query = query.filter(ServiceOrder.c_uid == uid)
 
         if int(page_params["nature"]) > -1:
             query = query.filter(ServiceOrder.snap_nature == int(page_params["nature"]))
@@ -104,37 +104,37 @@ class OrderService:
 
     def ops(self, data):
         act = data['act']
-        sid = data['id']
-        serviceOrder = self.getOrder(sid)
+        oid = data['id']
+        serviceOrder = self.getOrder(oid)
         if not serviceOrder:
             raise APIParameterException("订单不存在")
         if act == 'remove':
-            self.remove(sid)
+            self.remove(oid)
         elif act == 'lock':
             status = -1 * serviceOrder.status
-            self.updateStatus(sid, status)
+            self.updateStatus(oid, status)
         elif act == 'recover':
-            self.updateStatus(sid, abs(serviceOrder.status))
+            self.updateStatus(oid, abs(serviceOrder.status))
         elif act == 'agree':
-            self.updateStatus(sid, OrderStatus.UNPAID)
+            self.updateStatus(oid, OrderStatus.UNPAID)
         elif act == 'pay':
-            self.updateStatus(sid, OrderStatus.UNCONFIRMED)
+            self.updateStatus(oid, OrderStatus.UNCONFIRMED)
         elif act == 'confirmed':
-            self.updateStatus(sid, OrderStatus.UNRATED)
+            self.updateStatus(oid, OrderStatus.UNRATED)
         elif act == 'rating':
-            self.updateStatus(sid, OrderStatus.COMPLETED)
+            self.updateStatus(oid, OrderStatus.COMPLETED)
         elif act == 'canceled':
-            self.updateStatus(sid, OrderStatus.CANCELED)
+            self.updateStatus(oid, OrderStatus.CANCELED)
         elif act == 'deny':
-            self.updateStatus(sid, OrderStatus.REFUSED)
+            self.updateStatus(oid, OrderStatus.REFUSED)
         return serviceOrder
 
-    def updateStatus(self, sid, status):
-        db.session.query(ServiceOrder).filter_by(id=sid).update({'status': status, 'updated': getCurrentDate()})
+    def updateStatus(self, oid, status):
+        db.session.query(ServiceOrder).filter_by(id=oid).update({'status': status, 'updated': getCurrentDate()})
         db.session.commit()
 
-    def remove(self, sid):
-        db.session.query(ServiceOrder).filter(ServiceOrder.id == sid).delete()
+    def remove(self, oid):
+        db.session.query(ServiceOrder).filter(ServiceOrder.id == oid).delete()
         db.session.commit()
 
     def edit(self, serviceOrder):
@@ -173,13 +173,14 @@ class OrderService:
 
         return data
 
-    def createOrder(self, service, address):
+    def createOrder(self, cuid,service, address):
         order = ServiceOrder()
         now = datetime.datetime.now()
         order.orderNo = now.strftime("%d%H%M%S") + str(int(time.time()))
         order.status = OrderStatus.UNAPPROVED
         order.p_uid = service.p_uid
-        order.c_uid = 1
+        order.c_uid = cuid
+        order.sid = service.id
         order.price = service.price
         order.snap_title = service.title
         order.snap_category = service.category

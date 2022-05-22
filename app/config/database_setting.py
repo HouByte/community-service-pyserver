@@ -22,5 +22,5 @@ PERMANENT_SESSION_LIFETIME = timedelta(days=7)
 # Redis 配置
 REDIS_HOST = os.getenv('REDIS_HOST') or "127.0.0.1"
 REDIS_PORT = int(os.getenv('REDIS_PORT') or 6379)
-REDIS_DB = int(os.getenv('REDIS_DB') or 6379)
+REDIS_DB = int(os.getenv('REDIS_DB') or 0)
 REDIS_EXPIRE = int(os.getenv('REDIS_EXPIRE') or 86400)

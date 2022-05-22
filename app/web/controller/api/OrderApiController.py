@@ -30,11 +30,11 @@ def list():
     req = request.args
     page_params = getPageParams(req, app)
     #校验权限 存在状态查询需要登入
-    if page_params["status"] != '' and int(page_params["status"]) >= 0:
-        p_uid = get_member_login_id()
-        if not p_uid:
-            raise APIAuthFailed
-        page_params['p_uid'] = p_uid
+    uid = get_member_login_id()
+    if not uid:
+        raise APIAuthFailed
+    page_params['uid'] = uid
+
     page_params['api'] = True
     page_params['role'] = req.get("role", 1)
     resp_data = orderService.getOrderList(page_params)
@@ -87,10 +87,12 @@ def getStatus():
 
 @order_api.post("/create")
 def createOrder():
+    c_uid = get_member_login_id()
+    if not c_uid:
+        raise APIAuthFailed
     req = request.values
     address = req['address']
     serviceId = req['serviceId']
-    print(address)
     service = sService.getService(serviceId)
     if not service:
         raise APINotFound
@@ -100,7 +102,7 @@ def createOrder():
         # "postalCode":"510000","provinceName":"广东省","cityName":"广州市","countyName":"海珠区","detailInfo":"x"}
         if not address or len(address) < 190:
             raise APIParameterException("需要地址信息")
-    orderService.createOrder(service, address)
+    orderService.createOrder(c_uid,service, address)
     return CommonResult.success()
 
 @order_api.post("/ops")

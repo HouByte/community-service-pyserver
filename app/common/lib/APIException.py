@@ -58,6 +58,13 @@ class APIUpdateSuccess(APIException):
     error_code = 2
 
 
+class APIUpdateFail(APIException):
+    code = 400
+    msg = 'update fail'
+    error_code = 2
+
+
+
 class APIServerError(APIException):
     code = 500
     msg = 'sorry, we made a mistake!'
