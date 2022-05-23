@@ -80,7 +80,7 @@ def newRating():
         raise APIParameterException("请输入符合规范的姓名")
     if score < 1:
         raise APIParameterException("请输入符合规范评分")
-    if content is None or len(content) < 10:
+    if content is None or len(content) < 2:
         raise APIParameterException("请输入符合规范的评论")
     order = orderService.ops({'id': oid, 'act': 'rating'})
     ratingService.newRating(a_uid,order.sid, oid, score, content, illustration)

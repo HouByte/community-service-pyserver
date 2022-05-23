@@ -89,6 +89,22 @@ class Redis(object):
         r.hdel(name, key)
 
     @classmethod
+    def sadd(cls, key, value):
+        """
+        写入hash表
+        """
+        r = cls._get_r()
+        r.sadd(key, value)
+
+    @classmethod
+    def spop(cls, key, count):
+        """
+        写入hash表
+        """
+        r = cls._get_r()
+        return r.spop(key, count)
+
+    @classmethod
     def expire(cls, name, expire=None):
         """
         设置过期时间

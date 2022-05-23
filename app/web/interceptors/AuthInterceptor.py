@@ -3,7 +3,6 @@
 # @Author : Vincent Vic
 # @File : AuthInterceptor.py
 # @Software: PyCharm
-import json
 import re
 
 from flask import request, redirect, g

@@ -111,15 +111,17 @@ class SService:
         elif act == 'refuse':
             self.updateStatus(sid, ServiceStatus.DENY)
 
+    def updateSalesVolume(self, sid, sales_volume):
+        db.session.query(Service).filter_by(id=sid).update({'salesVolume': sales_volume, 'updated': getCurrentDate()})
+        db.session.commit()
+
     def updateStatus(self, sid, status):
         db.session.query(Service).filter_by(id=sid).update({'status': status, 'updated': getCurrentDate()})
         db.session.commit()
-        db.session.close()
 
     def remove(self, sid):
         db.session.query(Service).filter(Service.id == sid).delete()
         db.session.commit()
-        db.session.close()
 
     def edit(self, service):
         service.updated = getCurrentDate()
@@ -143,7 +145,6 @@ class SService:
                     'updated': getCurrentDate()})
 
         db.session.commit()
-        db.session.close()
 
     def statusData(self, mid, type):
 

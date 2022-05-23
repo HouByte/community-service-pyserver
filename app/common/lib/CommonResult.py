@@ -3,11 +3,9 @@
 # @Author : Vincent Vic
 # @File : Response.py
 # @Software: PyCharm
-import json
 
 from flask import jsonify
 
-from application import db
 from common.lib.Utils import ObjToJson
 
 

@@ -4,8 +4,10 @@
 # @File : RatingService.py
 # @Software: PyCharm
 from application import db
+from common.lib.APIException import APINotFound
 from common.lib.Helper import getCurrentDate, Pagination
 from web.model.Rating import Rating
+from web.model.Service import Service
 from web.service.MemberService import MemberService
 
 memberService = MemberService()
@@ -34,6 +36,7 @@ class RatingService:
         rating.created = getCurrentDate()
         db.session.add(rating)
         db.session.commit()
+        self.rating_conut(sid)
 
     def getRatingList(self, page_params):
         query = Rating.query
@@ -53,6 +56,8 @@ class RatingService:
 
     def getRatingByOrder(self, oid):
         rating = Rating.query.filter(Rating.oid == oid).first()
+        if not rating:
+            raise APINotFound
         return self.toVo(rating)
 
     def toVo(self, rating):
@@ -61,7 +66,7 @@ class RatingService:
         item['id'] = rating.id
         item['score'] = rating.score
         item['content'] = rating.content
-        if len(rating.illustration) >0:
+        if len(rating.illustration) > 0:
             item['illustration'] = rating.illustration.split(",")
         item['created'] = rating.created.strftime('%Y-%m-%d')
         item['author'] = {
@@ -70,3 +75,9 @@ class RatingService:
         }
 
         return item
+
+    def rating_conut(self, sid):
+        sql = "SELECT SUM(score) / COUNT(sid) AS average FROM `rating` WHERE sid=:sid"
+        average = db.session.execute(sql, {'sid': sid}).first()
+        db.session.query(Service).filter_by(id=sid).update({'score': average[0], 'updated': getCurrentDate()})
+        db.session.commit()

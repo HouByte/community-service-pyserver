@@ -3,13 +3,15 @@
 # @Author : Vincent Vic
 # @File : AuthHelper.py
 # @Software: PyCharm
-from flask import render_template, g, request
+import json
+
+from flask import request
 
 from application import app
 from common.lib.Helper import getCurrentDate
 from common.lib.constant import API_TOKEN_KEY_REDIS, ADMIN_TOKEN_KEY_REDIS, ADMIN_LOG_UID_KEY_REDIS
 from common.lib.redis import Redis
-import json
+
 
 def check_login():
     cookies = request.cookies

@@ -6,7 +6,6 @@
 # 统一渲染方法
 import datetime
 import math
-import time
 
 from flask import render_template, g
 

@@ -4,9 +4,8 @@
 # @File : FileUploadApiController.py
 # @Software: PyCharm
 import os
-import time
 
-from flask import jsonify, request, Blueprint
+from flask import request, Blueprint
 
 from application import app
 from common.lib.CommonResult import CommonResult

@@ -3,12 +3,12 @@
 # @Author : Vincent Vic
 # @File : application.py
 # @Software: PyCharm
+import os
+
 import redis
+from dotenv import load_dotenv
 from flask import Flask, jsonify, request
 from flask_sqlalchemy import SQLAlchemy
-import os
-from dotenv import load_dotenv
-from sqlalchemy import create_engine
 from werkzeug.exceptions import HTTPException
 
 from common.lib.APIException import APIException

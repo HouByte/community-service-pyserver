@@ -106,6 +106,8 @@ def createOrder():
         if not address or len(address) < 190:
             raise APIParameterException("需要地址信息")
     orderService.createOrder(c_uid, service, address, payNum)
+    sales_volume = service.salesVolume + payNum
+    sService.updateSalesVolume(serviceId, sales_volume)
     return CommonResult.success()
 
 @order_api.post("/ops")

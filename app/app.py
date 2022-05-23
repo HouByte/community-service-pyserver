@@ -4,7 +4,6 @@
 # @File : app.py
 # @Software: PyCharm
 from application import app
-import web.controller
 
 # web server
 if __name__ == '__main__':

@@ -8,8 +8,6 @@ import os
 # DATABASE 配置
 from datetime import timedelta
 
-from sqlalchemy.pool import QueuePool
-
 DATABASE_TYPE = os.getenv('DATABASE_TYPE') or "mysql"
 DATABASE_USERNAME = os.getenv('DATABASE_USERNAME') or "root"
 DATABASE_PASSWORD = os.getenv('DATABASE_PASSWORD') or "root"

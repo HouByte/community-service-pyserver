@@ -4,13 +4,12 @@
 # @File : CategoryService.py
 # @Software: PyCharm
 import datetime
+import logging
+import sys
 import uuid
 
 from qcloud_cos import CosConfig
 from qcloud_cos import CosS3Client
-import sys
-import logging
-
 
 # 正常情况日志级别使用INFO，需要定位时可以修改为DEBUG，此时SDK会打印和服务端的通信信息
 from common.lib.APIException import APIUpdateFail

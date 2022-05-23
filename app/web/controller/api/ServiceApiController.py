@@ -10,7 +10,6 @@ from common.lib.APIException import APIParameterException, APIAuthFailed
 from common.lib.AuthHelper import get_member_login_id
 from common.lib.CommonResult import CommonResult
 from common.lib.Helper import getPageParams, getOpsData
-from web.model.Service import Service
 from web.service.CategoryService import CategoryService
 from web.service.MemberService import MemberService
 from web.service.SService import SService

@@ -16,7 +16,6 @@ from common.lib.constant import OrderStatus
 from web.model.ServiceOrder import ServiceOrder
 from web.service.CategoryService import CategoryService
 from web.service.MemberService import MemberService
-from web.service.UserService import UserService
 
 categoryService = CategoryService()
 memberService = MemberService()
