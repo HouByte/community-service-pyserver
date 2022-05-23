@@ -265,13 +265,13 @@ class OrderService:
             'today-trading-volume': 0,
             '30-trading-volume': len(list),
         }
+        now_date = datetime.datetime.now().strftime('%Y-%m-%d')
         for item in list:
-            print(item.created.date())
             if OrderStatus.UNPAID < item.status < OrderStatus.CANCELED:
                 resp_data['30-trading-amount'] = resp_data['30-trading-amount'] + item.price
-                if item.created == datetime.datetime.today().date():
+                if item.created.strftime('%Y-%m-%d') == now_date:
                     resp_data['today-trading-amount'] = resp_data['today-trading-amount'] + item.price
-            if item.created == datetime.datetime.today().date():
+            if item.created.strftime('%Y-%m-%d') == now_date:
                 resp_data['today-trading-volume'] = resp_data['today-trading-volume'] + 1
         return resp_data
 

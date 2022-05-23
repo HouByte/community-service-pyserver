@@ -155,7 +155,7 @@ class MemberService:
             '30-member-volume': len(list),
         }
         for item in list:
-            if item.created_time == datetime.datetime.today().date():
+            if item.created_time.strftime('%Y-%m-%d') == datetime.datetime.now().strftime('%Y-%m-%d'):
                 resp_data['today-member-volume'] = resp_data['today-member-volume'] + 1
 
         return resp_data

@@ -204,7 +204,7 @@ class SService:
         for item in list:
             if item.status == ServiceStatus.PENDING:
                 resp_data['pending-review-volume'] = resp_data['pending-review-volume'] + 1
-            if item.created == datetime.datetime.today().date():
+            if item.created.strftime('%Y-%m-%d') == datetime.datetime.now().strftime('%Y-%m-%d'):
                 resp_data['today-service-volume'] = resp_data['today-service-volume'] + 1
 
         return resp_data
