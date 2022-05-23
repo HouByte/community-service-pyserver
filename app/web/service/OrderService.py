@@ -116,7 +116,8 @@ class OrderService:
         elif act == 'recover':
             self.updateStatus(oid, abs(serviceOrder.status))
         elif act == 'agree':
-            self.updateStatus(oid, OrderStatus.UNPAID)
+            # self.updateStatus(oid, OrderStatus.UNPAID)
+            self.updateStatus(oid, OrderStatus.UNCONFIRMED)
         elif act == 'pay':
             self.updateStatus(oid, OrderStatus.UNCONFIRMED)
         elif act == 'confirmed':
