@@ -93,6 +93,9 @@ def createOrder():
     req = request.values
     address = req['address']
     serviceId = req['serviceId']
+    payNum = int(req['payNum']) if 'payNum' in req else -1
+    if payNum < 1:
+        raise APIParameterException("支付数量异常")
     service = sService.getService(serviceId)
     if not service:
         raise APINotFound
@@ -102,7 +105,7 @@ def createOrder():
         # "postalCode":"510000","provinceName":"广东省","cityName":"广州市","countyName":"海珠区","detailInfo":"x"}
         if not address or len(address) < 190:
             raise APIParameterException("需要地址信息")
-    orderService.createOrder(c_uid,service, address)
+    orderService.createOrder(c_uid, service, address, payNum)
     return CommonResult.success()
 
 @order_api.post("/ops")

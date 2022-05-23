@@ -173,7 +173,7 @@ class OrderService:
 
         return data
 
-    def createOrder(self, cuid,service, address):
+    def createOrder(self, cuid,service, address, payNum):
         order = ServiceOrder()
         now = datetime.datetime.now()
         order.orderNo = now.strftime("%d%H%M%S") + str(int(time.time()))
@@ -181,7 +181,8 @@ class OrderService:
         order.p_uid = service.p_uid
         order.c_uid = cuid
         order.sid = service.id
-        order.price = service.price
+        order.pay_num = payNum
+        order.price = service.price * payNum
         order.snap_title = service.title
         order.snap_category = service.category
         order.snap_price = service.price
@@ -253,6 +254,7 @@ class OrderService:
         item['id'] = order.id
         item['orderNo'] = order.orderNo
         item['price'] = order.price
+        item['payNum'] = order.pay_num
         item['status'] = order.status
         return item
 

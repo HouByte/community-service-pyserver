@@ -15,6 +15,7 @@ class ServiceOrder(db.Model):
     snap_nature = db.Column(db.Integer, nullable=False, info='性质：0 互助，1 服务，2 公益')
     snap_cover_image = db.Column(db.String(255), nullable=False, info='服务封面镜像')
     price = db.Column(db.Numeric(10, 2), nullable=False, info='订单金额')
+    pay_num = db.Column(db.Integer, nullable=False, info='支付数量')
     snap_price = db.Column(db.Numeric(10, 2), nullable=False, info='服务价格镜像')
     snap_category = db.Column(db.Integer, nullable=False, info='分类')
     consumer_snap_username = db.Column(db.String(100), info='客户名字镜像')
