@@ -54,3 +54,5 @@ flask-sqlacodegen 'mysql://root:root@127.0.0.1/community_service' --outfile "com
 flask-sqlacodegen 'mysql://root:root@127.0.0.1/community_service' --tables user --outfile "app/web/model/user.py"  --flask
 ```		
 
+## 对应前端小程序
+[小程序](https://github.com/Vincent-Vic/community-service-mini)
