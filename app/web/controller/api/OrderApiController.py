@@ -23,6 +23,7 @@ categoryService = CategoryService()
 memberService = MemberService()
 
 ops_power = ['agree', 'pay', 'confirmed', 'canceled', 'deny']
+service_power = ['agree',  'deny']
 
 
 @order_api.route("/list")
@@ -120,10 +121,9 @@ def ops():
     if data['act'] not in ops_power:
         raise APIParameterException("没有该操作")
     order = orderService.getOrder(int(data['id']))
-    print(a_uid!=order.p_uid)
-    if data['act'] == 'agree' and a_uid != order.p_uid:
+    if data['act'] in service_power and a_uid != order.p_uid:
         raise APIParameterException("你不是服务所有人")
-    elif data['act'] != 'agree' and a_uid != order.c_uid:
+    elif data['act'] not in service_power and a_uid != order.c_uid:
         raise APIParameterException("你不是订单所有人")
 
     orderService.ops(data)

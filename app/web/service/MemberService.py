@@ -74,8 +74,6 @@ class MemberService:
             omb.created_time = getCurrentDate()
             omb.updated_time = getCurrentDate()
             db.session.add(omb)
-            db.session.commit()
-            db.session.close()
 
         else:
             member = self.getMember(omb.member_id)

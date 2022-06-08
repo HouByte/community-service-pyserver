@@ -41,6 +41,7 @@ class OrderService:
         if not serviceOrder:
             raise APIParameterException("订单不存在")
         info = dict(serviceOrder)
+        print(info)
         # p_user
         p_user = memberService.getMember(serviceOrder.p_uid)
         info['p_user'] = {

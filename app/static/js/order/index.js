@@ -54,8 +54,9 @@ var member_index_ops = {
                     }
                     content = content + " <span class=\"layui-badge layui-bg-"+nature_color+"\">"+nature+"</span></li>"
                     if (data['snap_nature'] === 1){
-                         content = content + "<li><span style='font-size: 18px;margin-right: 5px;'>服务费用:</span>"+
-                             data['snap_price']+"</li>"
+                         content = content + "<li><span style='font-size: 18px;margin-right: 5px;'>服务费用:</span>"+ data['snap_price'] +"</li>"+
+                             "<li><span style='font-size: 18px;margin-right: 5px;'>购买数量:</span>"+ data['pay_num']+"</li>"+
+                             "<li><span style='font-size: 18px;margin-right: 5px;'>订单金额:</span>"+ data['price']+"</li>"
                     }
 
                     content = content +

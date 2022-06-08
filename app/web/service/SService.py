@@ -47,7 +47,6 @@ class SService:
         query = Service.query
         # 分页处理
         page_params['total'] = query.count()
-
         mix_kw = page_params['mix_kw']
         # 昵称或手机号码查询
         if mix_kw != '':
@@ -56,7 +55,6 @@ class SService:
         p_uid = int(page_params["p_uid"]) if 'p_uid' in page_params else -1
         openApi = True if 'api' in page_params else False
         status = int(page_params["status"])
-
         # 状态查询,状态大于-1 且 不是公开api可以查询 (后台)
         if status > -1 and not openApi:
             page_params['total'] = query.filter(Service.status == status).count()
@@ -78,14 +76,12 @@ class SService:
         elif openApi:
             page_params['total'] = query.filter(Service.status == ServiceStatus.PUBLISHED).count()
             query = query.filter(Service.status == ServiceStatus.PUBLISHED)  # 公开状态查询
-
         if int(page_params["nature"]) > -1:
             query = query.filter(Service.nature == int(page_params["nature"]))
         if int(page_params["type"]) > -1:
             query = query.filter(Service.type == int(page_params["type"]))
         if int(page_params["category_id"]) > -1:
             query = query.filter(Service.category == int(page_params["category_id"]))
-
         pages = Pagination(page_params)
         serviceList = query.order_by(Service.id.desc()).all()[pages.getOffset():pages.getLimit()]
         resp_data = {

@@ -28,9 +28,10 @@ class ServiceOrder(db.Model):
     updated = db.Column(db.DateTime, server_default=db.FetchedValue(), info='更新时间')
 
     def keys(self):
-        return ['id', 'orderNo', 'status', 'p_uid', 'c_uid', 'snap_title', 'snap_nature', 'snap_cover_image',
-                'snap_price', 'snap_category', 'consumer_snap_username', 'consumer_snap_tel', 'consumer_snap_province',
-                'consumer_snap_city', 'consumer_snap_county', 'consumer_snap_description', 'created', 'updated']
+        return ['id', 'orderNo', 'price', 'pay_num', 'status', 'p_uid', 'c_uid', 'snap_title', 'snap_nature',
+                'snap_cover_image', 'snap_price', 'snap_category', 'consumer_snap_username', 'consumer_snap_tel',
+                'consumer_snap_province','consumer_snap_city', 'consumer_snap_county', 'consumer_snap_description',
+                'created', 'updated']
 
     def __getitem__(self, item):
         return getattr(self, item)
